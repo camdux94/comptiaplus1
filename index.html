@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="icon" href="./icon-192.png" type="image/png">
 <style>
-  body{ margin:0; background:#080b08; display:flex; justify-content:center; padding:24px 12px; }
+  body{ margin:0; background:#080b08; display:flex; justify-content:center; padding:calc(24px + env(safe-area-inset-top)) 12px calc(24px + env(safe-area-inset-bottom)); }
   #app-root-wrap{ width:100%; max-width:480px; }
   :root{
     --void:#080b08;
