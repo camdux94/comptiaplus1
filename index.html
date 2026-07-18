@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Core 1 Trainer \u2014 CompTIA A+ 220-1101 Study App</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#080b08">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="A+ Trainer">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" href="./icon-192.png" type="image/png">
 <style>
   body{ margin:0; background:#080b08; display:flex; justify-content:center; padding:24px 12px; }
   #app-root-wrap{ width:100%; max-width:480px; }
@@ -772,6 +779,12 @@ function topbarHtml(minimal){
 window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest, exitQuiz, openModal, closeModal };
 loadState();
 })();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => { /* offline support just won't be available */ });
+  });
+}
 </script>
 </body>
 </html>
