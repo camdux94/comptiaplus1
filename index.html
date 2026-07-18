@@ -46,9 +46,26 @@
   @keyframes blink{ 50%{ opacity:0; } }
   .stat-pill{
     display:flex; align-items:center; gap:6px; background:var(--surface-raised);
-    border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:12.5px; font-family:var(--mono);
+    border:1px solid var(--border); border-radius:20px; padding:9px 14px; font-size:13px; font-family:var(--mono);
+    color:var(--text); font-family:inherit; min-height:38px;
   }
+  .stat-pill.clickable{ cursor:pointer; transition:.12s; touch-action:manipulation; -webkit-tap-highlight-color:rgba(0,255,65,0.25); }
+  .stat-pill.clickable:hover, .stat-pill.clickable:active{ border-color:var(--green-dim); background:var(--surface); }
   .stat-row{ display:flex; gap:8px; }
+
+  .modal-overlay{
+    position:absolute; inset:0; background:rgba(4,6,4,0.82); display:flex; align-items:center; justify-content:center;
+    z-index:50; border-radius:12px; padding:20px; animation:fadeIn .15s ease;
+  }
+  .modal-card{
+    background:var(--surface-raised); border:1px solid var(--border); border-radius:14px; padding:24px 22px;
+    width:100%; max-width:300px; text-align:center;
+  }
+  .modal-icon{ font-size:32px; margin-bottom:6px; }
+  .modal-big{ font-family:var(--mono); font-size:28px; font-weight:700; }
+  .modal-label{ color:var(--text-muted); font-family:var(--mono); font-size:11px; letter-spacing:.5px; margin-bottom:16px; }
+  .modal-row{ display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-top:1px solid var(--border); text-align:left; }
+  .modal-note{ color:var(--text-muted); font-size:12px; line-height:1.5; margin:14px 0; text-align:left; }
   .amber{ color:var(--amber); }
   .green{ color:var(--green); }
   .muted{ color:var(--text-muted); }
@@ -400,7 +417,7 @@ const EXAM_WEIGHTS = { mobile:0.15, networking:0.20, hardware:0.25, virt:0.11, t
 const DIAGNOSTIC_SIZE = 20;
 
 let state = {
-  xp:0, streak:0, lastActiveDate:null,
+  xp:0, streak:0, longestStreak:0, lastActiveDate:null,
   domainStats:{}, // key -> {correct, total}
   lessonDone:{},  // lessonKey -> true
   diagnosticHistory:[], // [{date, pct, correct, total, domainPct}] newest first
@@ -408,20 +425,22 @@ let state = {
   activeDomain:null, activeLesson:null,
   quizQueue:[], quizIndex:0, quizAnswers:[], quizMode:"lesson", // 'lesson' | 'diagnostic'
   selectedOpt:null, answered:false,
-  hint:null, hintLoading:false
+  hint:null, hintLoading:false,
+  modal:null // null | 'streak' | 'xp'
 };
 
 async function loadState(){
   try{
     const raw = localStorage.getItem('aplus-progress');
-    if(raw){ const saved = JSON.parse(raw); state = Object.assign(state, saved, {screen:"home", quizQueue:[], quizIndex:0, quizAnswers:[], selectedOpt:null, answered:false, hint:null, hintLoading:false}); }
+    if(raw){ const saved = JSON.parse(raw); state = Object.assign(state, saved, {screen:"home", quizQueue:[], quizIndex:0, quizAnswers:[], selectedOpt:null, answered:false, hint:null, hintLoading:false, modal:null}); }
   }catch(e){ /* no saved state yet */ }
   if(!state.diagnosticHistory) state.diagnosticHistory = [];
+  if(!state.longestStreak) state.longestStreak = state.streak || 0;
   render();
 }
 async function saveState(){
   try{
-    const toSave = { xp:state.xp, streak:state.streak, lastActiveDate:state.lastActiveDate, domainStats:state.domainStats, lessonDone:state.lessonDone, diagnosticHistory:state.diagnosticHistory };
+    const toSave = { xp:state.xp, streak:state.streak, longestStreak:state.longestStreak, lastActiveDate:state.lastActiveDate, domainStats:state.domainStats, lessonDone:state.lessonDone, diagnosticHistory:state.diagnosticHistory };
     localStorage.setItem('aplus-progress', JSON.stringify(toSave));
   }catch(e){ console.error('save failed', e); }
 }
@@ -434,6 +453,7 @@ function bumpStreak(){
   if(state.lastActiveDate === y.toDateString()) state.streak += 1;
   else state.streak = 1;
   state.lastActiveDate = today;
+  if(state.streak > state.longestStreak) state.longestStreak = state.streak;
 }
 
 function domainProgress(domain){
@@ -545,6 +565,8 @@ function exitQuiz(){
   if(state.quizMode === "lesson" && state.activeDomain){ openDomain(state.activeDomain); }
   else { goHome(); }
 }
+function openModal(type){ state.modal = type; render(); }
+function closeModal(){ state.modal = null; render(); }
 function practiceWeakest(){
   const last = state.diagnosticHistory[0];
   if(!last) return goHome();
@@ -702,6 +724,38 @@ function render(){
     html += `<button class="primary-btn" onclick="__aplus.goHome()">Back to Dashboard</button>`;
   }
 
+  if(state.modal){
+    if(state.modal === "streak"){
+      html += `<div class="modal-overlay" onclick="if(event.target===this) __aplus.closeModal()">
+        <div class="modal-card">
+          <div class="modal-icon">\ud83d\udd25</div>
+          <div class="modal-big amber">${state.streak} day${state.streak===1?'':'s'}</div>
+          <div class="modal-label">current streak</div>
+          <div class="modal-row"><span class="muted">Longest streak</span><span>${state.longestStreak} day${state.longestStreak===1?'':'s'}</span></div>
+          <div class="modal-row"><span class="muted">Last active</span><span>${state.lastActiveDate || '\u2014'}</span></div>
+          <p class="modal-note">Answer at least one question correctly each day to keep your streak alive. Miss a day and it resets to 1.</p>
+          <button class="primary-btn" onclick="__aplus.closeModal()">Close</button>
+        </div>
+      </div>`;
+    } else if(state.modal === "xp"){
+      const rows = DOMAINS.map(d=>{
+        const s = state.domainStats[d.key];
+        const domainXp = s ? s.correct * 10 : 0;
+        return `<div class="modal-row"><span class="muted">${d.name}</span><span class="green">${domainXp} XP</span></div>`;
+      }).join('');
+      html += `<div class="modal-overlay" onclick="if(event.target===this) __aplus.closeModal()">
+        <div class="modal-card">
+          <div class="modal-icon">\u26a1</div>
+          <div class="modal-big green">${state.xp} XP</div>
+          <div class="modal-label">total earned</div>
+          ${rows}
+          <p class="modal-note">+10 XP for every question you answer correctly, in lessons or the diagnostic.</p>
+          <button class="primary-btn" onclick="__aplus.closeModal()">Close</button>
+        </div>
+      </div>`;
+    }
+  }
+
   root.innerHTML = html;
 }
 
@@ -709,13 +763,13 @@ function topbarHtml(minimal){
   return `<div class="topbar">
     <div class="brand"><span class="green">A+</span><span class="muted">_trainer</span><span class="cursor"></span></div>
     <div class="stat-row">
-      <div class="stat-pill">\ud83d\udd25 <span class="amber">${state.streak}</span></div>
-      <div class="stat-pill">\u26a1 <span class="green">${state.xp}</span> XP</div>
+      <button type="button" class="stat-pill clickable" onclick="__aplus.openModal('streak')">\ud83d\udd25 <span class="amber">${state.streak}</span></button>
+      <button type="button" class="stat-pill clickable" onclick="__aplus.openModal('xp')">\u26a1 <span class="green">${state.xp}</span> XP</button>
     </div>
   </div>`;
 }
 
-window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest, exitQuiz };
+window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest, exitQuiz, openModal, closeModal };
 loadState();
 })();
 </script>
