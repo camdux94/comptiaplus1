@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core 1 Trainer \u2014 CompTIA A+ 220-1101 Study App</title>
+<style>
+  body{ margin:0; background:#080b08; display:flex; justify-content:center; padding:24px 12px; }
+  #app-root-wrap{ width:100%; max-width:480px; }
+  :root{
+    --void:#080b08;
+    --surface:#0e130e;
+    --surface-raised:#141c14;
+    --border:#1f2e1f;
+    --green:#00FF41;
+    --green-dim:#0e8f28;
+    --amber:#FFB000;
+    --red:#FF4444;
+    --text:#dff2e0;
+    --text-muted:#5f7a63;
+    --mono: 'IBM Plex Mono', 'SF Mono', Menlo, monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  #app-root{
+    background:var(--void);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:600px;
+    border-radius:12px;
+    overflow:hidden;
+    position:relative;
+    background-image:
+      linear-gradient(rgba(0,255,65,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,65,0.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .screen{ padding: 22px 20px 32px; animation: fadeIn .25s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:translateY(0)} }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px; font-family:var(--mono);
+  }
+  .brand{ display:flex; align-items:center; gap:8px; font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:.5px;}
+  .brand .cursor{ display:inline-block; width:8px; height:16px; background:var(--green); animation:blink 1.1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .stat-pill{
+    display:flex; align-items:center; gap:6px; background:var(--surface-raised);
+    border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:12.5px; font-family:var(--mono);
+  }
+  .stat-row{ display:flex; gap:8px; }
+  .amber{ color:var(--amber); }
+  .green{ color:var(--green); }
+  .muted{ color:var(--text-muted); }
+
+  h1.title{ font-family:var(--mono); font-size:20px; letter-spacing:.3px; margin:4px 0 2px; }
+  p.subtitle{ color:var(--text-muted); font-size:13px; margin:0 0 20px; }
+
+  .diag-cta{
+    background:linear-gradient(135deg, rgba(0,255,65,0.08), rgba(0,255,65,0.02));
+    border:1px solid var(--green-dim); border-radius:10px; padding:14px 16px; margin-bottom:22px;
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:.15s;
+  }
+  .diag-cta:hover{ border-color:var(--green); background:rgba(0,255,65,0.1); }
+  .diag-cta .label{ font-family:var(--mono); font-size:13px; }
+  .diag-cta .label b{ display:block; font-size:14.5px; color:var(--green); margin-bottom:2px;}
+  .arrow{ font-family:var(--mono); color:var(--green); }
+
+  .domain-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:16px; margin-bottom:12px; cursor:pointer; transition:.15s;
+  }
+  .domain-card:hover{ border-color:var(--green-dim); transform:translateY(-1px); }
+  .domain-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;}
+  .domain-code{ font-family:var(--mono); font-size:10.5px; color:var(--text-muted); letter-spacing:.5px;}
+  .domain-name{ font-size:15.5px; font-weight:600; margin-top:2px;}
+  .domain-pct{ font-family:var(--mono); font-size:13px; color:var(--green); }
+  .barwrap{ background:#0a100a; border:1px solid var(--border); border-radius:6px; height:8px; overflow:hidden; }
+  .barfill{ height:100%; background:linear-gradient(90deg, var(--green-dim), var(--green)); transition:width .4s ease; }
+  .domain-meta{ display:flex; justify-content:space-between; margin-top:8px; font-family:var(--mono); font-size:11px; color:var(--text-muted); }
+
+  .lesson-row{
+    display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:.15s;
+  }
+  .lesson-row:hover{ border-color:var(--green-dim); }
+  .lesson-icon{
+    width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:13px; flex-shrink:0; border:1px solid var(--border);
+  }
+  .lesson-icon.done{ background:rgba(0,255,65,0.1); color:var(--green); border-color:var(--green-dim); }
+  .lesson-icon.todo{ background:var(--surface-raised); color:var(--text-muted); }
+  .lesson-title{ font-size:14px; font-weight:600; }
+  .lesson-sub{ font-size:11.5px; color:var(--text-muted); font-family:var(--mono); margin-top:2px;}
+  .backbtn{ background:none; border:none; color:var(--text-muted); font-family:var(--mono); font-size:13px; cursor:pointer; padding:0; margin-bottom:14px; display:flex; align-items:center; gap:6px;}
+  .backbtn:hover{ color:var(--green); }
+
+  .progressbar-top{ height:5px; background:var(--surface-raised); border-radius:4px; overflow:hidden; margin-bottom:22px;}
+  .progressbar-top-fill{ height:100%; background:var(--green); transition:width .3s ease; }
+
+  .qcard{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
+  .qmeta{ font-family:var(--mono); font-size:11px; color:var(--text-muted); margin-bottom:10px; letter-spacing:.4px;}
+  .qtext{ font-size:16.5px; line-height:1.5; font-weight:600; }
+
+  .opt{
+    display:block; width:100%; text-align:left; background:var(--surface); border:1.5px solid var(--border);
+    color:var(--text); padding:14px 16px; border-radius:10px; margin-bottom:10px; font-size:14.5px;
+    cursor:pointer; transition:.12s; font-family:var(--sans);
+  }
+  .opt:hover:not(:disabled){ border-color:var(--green-dim); background:var(--surface-raised); }
+  .opt:disabled{ cursor:default; }
+  .opt.correct{ border-color:var(--green); background:rgba(0,255,65,0.1); color:var(--green); }
+  .opt.incorrect{ border-color:var(--red); background:rgba(255,68,68,0.08); color:#ff8080; }
+  .opt.faded{ opacity:.45; }
+
+  .feedback-banner{ font-family:var(--mono); font-weight:700; font-size:13px; letter-spacing:.5px; margin-bottom:6px; }
+  .feedback-banner.ok{ color:var(--green); }
+  .feedback-banner.bad{ color:var(--red); }
+
+  .explain-box{ background:var(--surface-raised); border:1px solid var(--border); border-left:3px solid var(--green-dim); border-radius:8px; padding:14px 16px; margin-top:14px; font-size:13.5px; line-height:1.55; color:#c3dcc6; }
+  .explain-box b{ color:var(--text); }
+
+  .hint-btn{ background:none; border:1px solid var(--border); color:var(--amber); font-family:var(--mono); font-size:12px; padding:8px 14px; border-radius:8px; cursor:pointer; margin-top:10px; }
+  .hint-btn:hover{ border-color:var(--amber); background:rgba(255,176,0,0.08); }
+  .hint-box{ background:rgba(255,176,0,0.06); border:1px solid rgba(255,176,0,0.35); border-radius:8px; padding:12px 14px; margin-top:10px; font-size:13px; color:#ffd280; line-height:1.5;}
+
+  .primary-btn{
+    width:100%; background:var(--green); color:#04120a; border:none; border-radius:10px; padding:14px;
+    font-family:var(--mono); font-weight:700; font-size:14px; cursor:pointer; margin-top:6px; transition:.15s;
+  }
+  .primary-btn:hover{ background:#33ff66; }
+  .primary-btn:disabled{ background:var(--surface-raised); color:var(--text-muted); cursor:not-allowed; }
+  .ghost-btn{
+    width:100%; background:none; color:var(--text-muted); border:1px solid var(--border); border-radius:10px; padding:12px;
+    font-family:var(--mono); font-size:13px; cursor:pointer; margin-top:8px;
+  }
+  .ghost-btn:hover{ border-color:var(--green-dim); color:var(--green); }
+
+  .result-ring{ width:150px; height:150px; margin:12px auto 18px; position:relative; }
+  .result-ring svg{ transform:rotate(-90deg); }
+  .result-ring .pct{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; font-family:var(--mono); }
+  .result-ring .pct b{ font-size:30px; color:var(--green); }
+  .result-ring .pct span{ font-size:10px; color:var(--text-muted); }
+
+  .breakdown-row{ display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 14px; margin-bottom:8px; font-size:13px;}
+  .breakdown-row .weak{ color:var(--amber); font-family:var(--mono); font-size:11px; }
+  .breakdown-row.clickable{ cursor:pointer; transition:.12s; }
+  .breakdown-row.clickable:hover{ border-color:var(--green-dim); background:var(--surface-raised); }
+
+  .history-strip{
+    display:flex; justify-content:space-between; align-items:center; background:var(--surface);
+    border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:16px;
+  }
+  .history-main{ display:flex; align-items:baseline; gap:8px; font-family:var(--mono); }
+  .history-main b{ font-size:18px; color:var(--green); }
+  .history-main .muted{ font-size:11px; }
+  .history-trend{ font-family:var(--mono); font-size:12px; }
+
+  .trend-line{ text-align:center; font-family:var(--mono); font-size:12.5px; margin-bottom:16px; }
+  .trend-line.green{ color:var(--green); }
+  .trend-line.amber{ color:var(--amber); }
+
+  .review-line{ font-size:13.5px; margin-bottom:6px; }
+
+  .streak-flame{ font-family:var(--mono); }
+  ::selection{ background:rgba(0,255,65,0.3); }
+  .empty-note{ text-align:center; color:var(--text-muted); font-size:12.5px; margin-top:26px; font-family:var(--mono); line-height:1.6; }
+</style>
+</head>
+<body>
+<div id="app-root-wrap">
+<div id="app-root"></div>
+</div>
+
+<script>
+(function(){
+
+const DOMAINS = [
+  {
+    key:"mobile", code:"220-1101 \u00b7 1.0", name:"Mobile Devices",
+    lessons:[
+      { key:"mobile-1", title:"Laptop Hardware & Docking", questions:[
+        { q:"A technician needs to replace a laptop's internal wireless card. What must be done immediately before removing the antenna leads?", opts:["Power off the laptop and disconnect it from AC power / remove the battery","Update the BIOS to the latest version","Boot into Safe Mode","Reinstall the wireless driver first"], correct:0,
+          exp:"Always fully power down and disconnect power (and remove the battery if it's removable) before opening a laptop. Working on live components risks short-circuiting the board or injuring the tech."},
+        { q:"Which device connects to a laptop through a single proprietary port and can supply charging, multiple video outputs, and extra USB/Ethernet ports?", opts:["Port replicator","Docking station","KVM switch","USB hub"], correct:1,
+          exp:"A docking station adds real functionality \u2014 charging, extra video outputs, sometimes even additional processing \u2014 through one connector. This is the key distinction the exam tests."},
+        { q:"How does a port replicator differ from a docking station?", opts:["A port replicator adds a discrete GPU","A port replicator simply extends the laptop's existing ports without adding new capability","A port replicator only works over Wi-Fi","There is no meaningful difference"], correct:1,
+          exp:"A port replicator is essentially a pass-through for ports the laptop already has (more USB, extend the existing video output). A docking station can add capability the laptop doesn't natively have."},
+        { q:"A laptop's keyboard needs replacing. What is the correct general order of operations?", opts:["Remove keyboard first, then power off","Power off, disconnect power/battery, then remove keyboard per the FRU (field replaceable unit) procedure","Replace while the OS is running to test immediately","Remove the screen first"], correct:1,
+          exp:"Standard laptop hardware replacement order: power down \u2192 disconnect power source \u2192 follow the specific FRU removal steps (often removing a back panel or keyboard retaining screws)."},
+        { q:"Which of these is typically NOT a laptop expansion option for adding storage or connectivity?", opts:["M.2 slot","SODIMM slot","Full-length PCIe x16 slot","SD card reader"], correct:2,
+          exp:"Full-length PCIe x16 slots are a desktop motherboard feature for discrete graphics cards \u2014 laptops don't have room for them. M.2, SODIMM (RAM), and SD readers are all common on laptops."}
+      ]},
+      { key:"mobile-2", title:"Mobile Connectivity", questions:[
+        { q:"Which short-range wireless technology, with an effective range of about 4cm, is used for contactless payments and quick device pairing?", opts:["Bluetooth","Infrared (IR)","NFC","RFID"], correct:2,
+          exp:"NFC (Near Field Communication) operates at very short range (a few centimeters) and is the technology behind tap-to-pay and quick pairing taps. Bluetooth has a much longer range."},
+        { q:"A phone is sharing its cellular data connection as a Wi-Fi network for a laptop. What is this feature called?", opts:["Mobile hotspot / tethering","Airplane mode","VPN passthrough","NFC beaming"], correct:0,
+          exp:"Tethering (mobile hotspot) turns the phone's cellular data into a Wi-Fi (or USB/Bluetooth) connection other devices can use."},
+        { q:"Which cellular generation is defined by the ability to exceed roughly 1 Gbps theoretical speed and significantly lower latency than its predecessor?", opts:["3G","4G LTE","5G","GSM"], correct:2,
+          exp:"5G is the generation associated with multi-gigabit theoretical speeds and much lower latency, enabling things like network slicing and improved IoT support."},
+        { q:"A user's phone won't pair with a new Bluetooth headset. What is the first troubleshooting step?", opts:["Factory reset the phone","Put the headset into pairing/discovery mode and ensure Bluetooth is enabled on the phone","Replace the headset battery","Update the phone's OS"], correct:1,
+          exp:"Pairing failures are most often solved by confirming both devices are actually in discovery/pairing mode with Bluetooth enabled \u2014 the simplest check before anything more invasive."},
+        { q:"Which mobile connectivity method uses line-of-sight and is largely obsolete for modern phone-to-phone transfer, but still appears on some remote controls?", opts:["Infrared (IR)","NFC","Bluetooth LE","Wi-Fi Direct"], correct:0,
+          exp:"Infrared requires direct line-of-sight and short range, which is why it faded from phone-to-phone transfer but persists in remote controls and some older device pairing."}
+      ]},
+      { key:"mobile-3", title:"Mobile OS & Accessories", questions:[
+        { q:"Installing an app from outside the official app store (not Google Play / App Store) is known as what, and is generally considered a security risk?", opts:["Sideloading","Tethering","OTA updating","Synchronizing"], correct:0,
+          exp:"Sideloading means installing an app package directly rather than through the vetted official store, which bypasses the store's security review \u2014 a common exam topic tied to mobile security risk."},
+        { q:"Which authentication method relies on a physical trait like a fingerprint or face scan?", opts:["PIN authentication","Biometric authentication","Pattern lock","Two-step verification via SMS"], correct:1,
+          exp:"Biometric authentication uses a unique physical characteristic (fingerprint, face, iris) rather than something the user memorizes or types."},
+        { q:"A phone's touchscreen registers taps in the wrong location, though the display looks fine. Which component is most likely at fault?", opts:["The digitizer","The battery","The SIM card","The speaker"], correct:0,
+          exp:"The digitizer is the layer that senses touch input; the display (LCD/OLED) and digitizer are separate components, so a digitizer fault can misregister touches while the picture itself still looks correct."},
+        { q:"Which mobile accessory allows a phone to accept credit card payments directly?", opts:["A card reader attachment","A stylus","A protective case","A screen protector"], correct:0,
+          exp:"A card reader (magnetic stripe or chip reader) plugs into or pairs with the phone so payment apps can process transactions on the spot."},
+        { q:"What is the main purpose of enabling remote wipe / 'Find My Device' on a company phone?", opts:["To improve battery life","To locate, lock, or erase a lost or stolen device remotely, protecting the data on it","To speed up app downloads","To reduce cellular data usage"], correct:1,
+          exp:"Remote wipe/locate features exist specifically so a lost or stolen device's data can be protected \u2014 either by locking it down or erasing it entirely before someone else can access it."},
+        { q:"Which is a common way mobile OSes keep contacts, calendar, and photos synced automatically across a user's devices?", opts:["Cloud-based account sync (e.g., iCloud or a Google account)","Manual USB transfer every time","Bluetooth pairing only","Infrared beaming"], correct:0,
+          exp:"Modern mobile OSes sync data through the user's cloud account (iCloud, Google, etc.) in the background, keeping contacts/calendar/photos consistent across every signed-in device without manual transfers."}
+      ]}
+    ]
+  },
+  {
+    key:"networking", code:"220-1101 \u00b7 2.0", name:"Networking",
+    lessons:[
+      { key:"net-1", title:"Ports & Protocols", questions:[
+        { q:"Which port number is used by SSH?", opts:["TCP 21","TCP 22","TCP 23","UDP 22"], correct:1,
+          exp:"SSH uses TCP port 22. It's easy to confuse with Telnet (TCP 23) or FTP control (TCP 21) \u2014 SSH is the secure remote-access replacement for Telnet."},
+        { q:"FTP uses two separate ports. Which pair is correct?", opts:["TCP 20 (data) and TCP 21 (control)","TCP 21 (data) and TCP 20 (control)","UDP 20 and UDP 21","TCP 20 and UDP 21"], correct:0,
+          exp:"FTP splits data and control: TCP 20 handles the actual data transfer, TCP 21 handles the control/command channel. Both are TCP, not UDP."},
+        { q:"Which protocol and port does DHCP use for the server listening for client requests?", opts:["TCP port 67","UDP port 67 (server) / UDP port 68 (client)","TCP port 68","UDP port 53"], correct:1,
+          exp:"DHCP is UDP-based: the server listens on UDP 67, and clients listen on UDP 68. DNS (port 53) is a separate protocol often confused with DHCP."},
+        { q:"Which port does DNS use, and which transport protocol is most common for standard lookups?", opts:["Port 53, primarily UDP (TCP used for zone transfers/large responses)","Port 53, TCP only","Port 43, UDP only","Port 80, TCP only"], correct:0,
+          exp:"DNS uses port 53. Standard queries are UDP for speed, but it falls back to TCP for zone transfers or responses too large for a single UDP packet."},
+        { q:"SMTP, used for sending email, uses which default port?", opts:["TCP 25","TCP 110","TCP 143","UDP 25"], correct:0,
+          exp:"SMTP (sending mail) is TCP port 25 by default (587 is common for authenticated submission). POP3 (110) and IMAP (143) are for retrieving mail, not sending."},
+        { q:"Which pair correctly matches a mail retrieval protocol to its port?", opts:["POP3 = TCP 110, IMAP = TCP 143","POP3 = TCP 143, IMAP = TCP 110","POP3 = UDP 110, IMAP = UDP 143","POP3 = TCP 25, IMAP = TCP 110"], correct:0,
+          exp:"POP3 downloads and typically removes mail from the server on TCP 110. IMAP keeps mail synced on the server on TCP 143. Mixing these two up is one of the most common port-memorization mistakes."}
+      ]},
+      { key:"net-2", title:"Networking Tools & Wireless", questions:[
+        { q:"Which tool would you use to test whether a specific TCP/UDP port is open on a remote host?", opts:["Loopback plug","Port scanner","Toner probe","Cable crimper"], correct:1,
+          exp:"A port scanner (like nmap) probes a host to see which ports are open/listening \u2014 useful for both troubleshooting and security assessment."},
+        { q:"A technician needs to trace which physical cable in a wiring closet corresponds to a specific wall jack. What tool pairing is used?", opts:["Toner probe (tone generator + probe)","Cable tester only","Punch-down tool","Wi-Fi analyzer"], correct:0,
+          exp:"A tone generator injects a signal onto a cable, and the probe 'listens' for that tone to identify the matching cable at the other end \u2014 the classic tool for tracing unlabeled runs."},
+        { q:"Which tool would best help a technician identify Wi-Fi channel congestion or rogue access points?", opts:["Wi-Fi analyzer","Cable certifier","Punch-down tool","Loopback adapter"], correct:0,
+          exp:"A Wi-Fi analyzer surveys the wireless spectrum \u2014 showing channel usage, signal strength, and nearby SSIDs \u2014 which is exactly what's needed to diagnose interference or unauthorized APs."},
+        { q:"A device Mobile Device Management (MDM) policy needs to be removed from a company phone before it's reassigned. What is the general correct approach?", opts:["Just delete the MDM app icon from the home screen","Un-enroll the device through the MDM profile/settings, then remove the management profile, which also removes the app's control","Restart the phone in Safe Mode","Change the phone's Wi-Fi password"], correct:1,
+          exp:"MDM apps are installed via a management profile that has elevated device control. Simply deleting the app icon typically won't fully remove it \u2014 you must un-enroll / remove the profile through Settings (or have IT push the removal) so the management control is properly revoked."},
+        { q:"Which of these best describes the purpose of a VLAN?", opts:["Logically segments a physical network into separate broadcast domains","Physically separates cables in a rack","Encrypts traffic between two routers","Increases a switch's port count"], correct:0,
+          exp:"A VLAN (Virtual LAN) segments one physical switch/network into multiple logical broadcast domains \u2014 improving security and traffic management without needing separate physical hardware."}
+      ]},
+      { key:"net-3", title:"IP Addressing & SOHO Networks", questions:[
+        { q:"Which of these is a private (non-routable on the public internet) IPv4 address?", opts:["192.168.1.10","8.8.8.8","1.1.1.1","172.32.0.5"], correct:0,
+          exp:"192.168.0.0/16 is one of the three private IPv4 ranges (with 10.0.0.0/8 and 172.16.0.0\u2013172.31.255.255). Note 172.32.0.5 is a common trap \u2014 it's just outside the private 172.16\u2013172.31 range, so it's actually public."},
+        { q:"What is the key structural difference between IPv4 and IPv6 addressing?", opts:["IPv6 uses 128-bit addresses, giving a vastly larger address space than IPv4's 32-bit addresses","IPv6 is only used on private networks","IPv4 supports more devices than IPv6","There is no difference in address length"], correct:0,
+          exp:"IPv4's 32-bit space (about 4.3 billion addresses) has been effectively exhausted, which is the whole reason IPv6's 128-bit space \u2014 astronomically larger \u2014 exists."},
+        { q:"Which wireless security protocol is the current strongest standard, succeeding WPA2?", opts:["WEP","WPA","WPA2","WPA3"], correct:3,
+          exp:"WPA3 is the current standard, adding stronger encryption and protections (like resistance to offline dictionary attacks) over WPA2. WEP is long obsolete and easily broken."},
+        { q:"On a SOHO router, what does enabling UPnP (Universal Plug and Play) do?", opts:["Automatically opens ports for applications that request them","Encrypts all outbound traffic","Disables the guest network","Forces all devices onto a single VLAN"], correct:0,
+          exp:"UPnP lets applications (games, torrent clients, etc.) automatically request port forwarding from the router. Convenient, but it's also a security tradeoff since it opens ports without manual review."},
+        { q:"A phone connects wirelessly to a smartwatch over a very short range using Bluetooth. What type of network is this?", opts:["WAN","MAN","LAN","PAN"], correct:3,
+          exp:"A PAN (Personal Area Network) covers a very short range around one person/their devices \u2014 classic examples are Bluetooth-connected phones, watches, and headsets."},
+        { q:"Which internet connection type uses existing telephone lines but doesn't tie up voice service the way old dial-up did?", opts:["DSL","Dial-up","Satellite","Fiber"], correct:0,
+          exp:"DSL (Digital Subscriber Line) runs over standard copper phone lines but uses separate frequency bands from voice calls, so unlike dial-up, the internet connection and phone line can be used simultaneously."}
+      ]}
+    ]
+  },
+  {
+    key:"hardware", code:"220-1101 \u00b7 3.0", name:"Hardware",
+    lessons:[
+      { key:"hw-1", title:"Cables & Connectors", questions:[
+        { q:"Which cable type is best suited for a run that needs to be run near heavy electrical interference (e.g., alongside power conduit)?", opts:["Unshielded twisted pair (UTP)","Shielded twisted pair (STP)","Standard coaxial without shielding","Any Cat5e cable"], correct:1,
+          exp:"STP has additional shielding around the twisted pairs specifically to reduce EMI (electromagnetic interference), making it the better choice near power lines or heavy machinery."},
+        { q:"Which connector is associated with older serial ATA power connections and is a thin, wide connector for internal drives?", opts:["SATA power connector","Molex connector","PCIe power connector","Barrel connector"], correct:0,
+          exp:"The SATA power connector is the flat, wide, L-shaped connector used for modern internal drives. Molex is the older 4-pin connector still seen on some fans/older peripherals."},
+        { q:"What is the primary advantage of Thunderbolt over standard USB-A in terms of capability?", opts:["It only works with Apple devices","Higher bandwidth and the ability to daisy-chain displays/devices over a single port","It uses a proprietary charging voltage only","It cannot carry video signals"], correct:1,
+          exp:"Thunderbolt combines high bandwidth, video (DisplayPort tunneling), power delivery, and daisy-chaining into a single connector \u2014 well beyond typical USB-A capability."},
+        { q:"A DisplayPort connection is intermittently dropping signal on a long run. What's a likely first thing to check?", opts:["The cable length/quality and connector seating","The monitor's brightness setting","The GPU driver version only","The desktop wallpaper resolution"], correct:0,
+          exp:"Long or low-quality DisplayPort cables are a very common cause of intermittent signal drops \u2014 checking cable length/rating and reseating connectors is the practical first step before diving into drivers."},
+        { q:"Which of these connectors is keyed and cannot be inserted upside-down, unlike USB-A?", opts:["USB-C","USB-A 2.0","PS/2 (round)","Both USB-C and PS/2 are keyed/reversible-safe in their own ways"], correct:3,
+          exp:"USB-C is reversible (works either orientation by design), and PS/2 round connectors are keyed so they only go in one correct way \u2014 both avoid the classic 'which way is up' problem of USB-A."}
+      ]},
+      { key:"hw-2", title:"RAM, Storage & RAID", questions:[
+        { q:"Which characteristic distinguishes DDR5 RAM from DDR4 in terms of physical compatibility?", opts:["DDR5 is backward compatible with DDR4 slots","DDR5 uses a different key notch and is NOT compatible with DDR4 slots","They are identical and interchangeable","DDR5 only comes in SODIMM form"], correct:1,
+          exp:"Each DDR generation uses a different notch position specifically to prevent installing the wrong generation into a motherboard that doesn't support it \u2014 DDR5 will not physically fit in a DDR4 slot."},
+        { q:"What is the main benefit of ECC (Error Correcting Code) RAM?", opts:["It runs at a lower voltage always","It can detect and correct single-bit memory errors, improving stability for servers/workstations","It doubles the RAM's clock speed","It eliminates the need for a memory controller"], correct:1,
+          exp:"ECC RAM can detect and correct common single-bit errors on the fly, which is why it's preferred for servers and mission-critical workstations where data integrity matters most."},
+        { q:"Which RAID level provides redundancy through mirroring, using two drives that store identical data?", opts:["RAID 0","RAID 1","RAID 5","RAID 10 only"], correct:1,
+          exp:"RAID 1 mirrors data across two drives \u2014 if one fails, the other has an identical copy. RAID 0 (striping) has no redundancy at all; it's purely for performance."},
+        { q:"Which RAID level stripes data across at least 3 drives and includes distributed parity for fault tolerance?", opts:["RAID 0","RAID 1","RAID 5","RAID 1+0 exclusively"], correct:2,
+          exp:"RAID 5 uses striping with distributed parity across 3+ drives, allowing the array to survive a single drive failure while still getting a performance/capacity benefit over pure mirroring."},
+        { q:"An NVMe drive is installed but not showing expected read/write speeds. What's a likely cause worth checking first?", opts:["The drive is installed in an M.2 slot wired for SATA instead of PCIe lanes","The drive needs a Molex adapter","The monitor resolution is too high","The RAM is the wrong generation"], correct:0,
+          exp:"Some M.2 slots are wired for SATA rather than PCIe NVMe lanes (or share lanes with other slots), which silently caps an NVMe drive to SATA speeds \u2014 always worth checking the motherboard manual for that slot's actual wiring."}
+      ]},
+      { key:"hw-3", title:"Motherboards, CPUs & Power", questions:[
+        { q:"Which motherboard form factor is the smallest of the common ATX-family sizes, suited for compact builds?", opts:["ATX","MicroATX","Mini-ITX","EATX"], correct:2,
+          exp:"Mini-ITX is the smallest common form factor in this family (ATX > MicroATX > Mini-ITX in size), trading expansion slots for a much smaller footprint."},
+        { q:"What does a CPU's socket type primarily determine?", opts:["Which specific physical CPUs are compatible with that motherboard","The maximum RAM speed supported","The number of USB ports available","The GPU's power draw"], correct:0,
+          exp:"The socket (e.g., LGA1700, AM5) is a physical and electrical interface \u2014 a CPU will only fit and function in a motherboard with a matching socket, regardless of other specs."},
+        { q:"Which CPU cooling method uses a liquid loop to move heat away from the CPU, generally outperforming air cooling under sustained heavy load?", opts:["Passive heatsink only","Liquid/AIO (all-in-one) cooling","Case fans alone","Thermal paste alone"], correct:1,
+          exp:"Liquid cooling (especially AIO closed-loop coolers) moves heat away more efficiently than air under sustained load, which is why it's common on high-TDP CPUs and overclocked systems."},
+        { q:"When choosing a power supply's wattage for a build, what should primarily guide the decision?", opts:["The case's physical size","The total estimated power draw of all installed components, with some headroom for peak loads","The color of the PSU","The number of SATA ports on the motherboard"], correct:1,
+          exp:"PSU wattage should be sized to the system's actual total draw (CPU, GPU, drives, fans, etc.) plus headroom \u2014 undersizing risks instability or shutdowns under load, especially for GPU-heavy builds."},
+        { q:"Where are boot order, secure boot, and other low-level hardware settings typically configured before the OS even loads?", opts:["Windows Device Manager","BIOS/UEFI setup","Disk Management","Control Panel"], correct:1,
+          exp:"BIOS/UEFI firmware runs before any OS loads and is where boot order, virtualization support, secure boot, and other hardware-level settings live."},
+        { q:"Which connector supplies supplemental power directly to a high-end graphics card, separate from what the PCIe slot itself provides?", opts:["SATA power connector","PCIe power connector (6-pin/8-pin)","Molex connector only","24-pin ATX connector"], correct:1,
+          exp:"The PCIe slot alone can't supply enough power for high-end GPUs, so dedicated 6-pin/8-pin PCIe power connectors from the PSU deliver the extra power those cards need."}
+      ]}
+    ]
+  },
+  {
+    key:"virt", code:"220-1101 \u00b7 4.0", name:"Virtualization & Cloud",
+    lessons:[
+      { key:"virt-1", title:"Cloud Concepts", questions:[
+        { q:"Which cloud model combines on-premises infrastructure with resources accessed over the internet?", opts:["Private cloud","Public cloud","Hybrid cloud","Community cloud"], correct:2,
+          exp:"A hybrid cloud blends on-premises (private) infrastructure with public cloud resources, letting an organization keep sensitive workloads local while bursting to the cloud for scale."},
+        { q:"Which cloud service model gives the customer the most control, providing raw virtualized hardware (compute, storage, networking) they configure themselves?", opts:["SaaS","PaaS","IaaS","DaaS"], correct:2,
+          exp:"IaaS (Infrastructure as a Service) hands the customer virtual machines, storage, and networking \u2014 they install and manage the OS and everything above it themselves, unlike PaaS or SaaS."},
+        { q:"Which cloud characteristic describes the ability to automatically increase or decrease resources based on demand?", opts:["Elasticity","Metered utilization","Multitenancy","High availability"], correct:0,
+          exp:"Elasticity is the ability of a cloud environment to scale resources up or down automatically to match real-time demand \u2014 a defining trait of cloud vs. traditional fixed infrastructure."},
+        { q:"What does 'multitenancy' refer to in cloud computing?", opts:["Multiple physical servers sharing one IP address","Multiple customers sharing the same underlying physical infrastructure, logically isolated from each other","One customer using multiple cloud regions","A backup strategy involving multiple sites"], correct:1,
+          exp:"Multitenancy means the cloud provider's physical hardware serves many customers simultaneously, with logical (not physical) separation keeping each tenant's data isolated."},
+        { q:"A company wants a cloud environment dedicated entirely to their organization, not shared with other tenants. Which model fits?", opts:["Public cloud","Private cloud","Community cloud","Hybrid cloud"], correct:1,
+          exp:"A private cloud is provisioned for exclusive use by a single organization, whether hosted on-premises or by a third party \u2014 the opposite of the shared-tenant public cloud model."}
+      ]},
+      { key:"virt-2", title:"Virtualization Concepts", questions:[
+        { q:"What is the primary purpose of a hypervisor?", opts:["To encrypt network traffic","To create and manage virtual machines on physical hardware","To act as a firewall","To compress storage volumes"], correct:1,
+          exp:"A hypervisor is the software layer that creates, runs, and manages virtual machines, allocating the physical host's CPU, RAM, and storage among them."},
+        { q:"What distinguishes a Type 1 hypervisor from a Type 2 hypervisor?", opts:["Type 1 runs directly on the hardware ('bare metal'); Type 2 runs on top of a host OS","Type 1 only works with Windows; Type 2 only works with Linux","Type 1 requires no CPU virtualization support; Type 2 does","There is no real difference"], correct:0,
+          exp:"Type 1 (bare-metal) hypervisors like ESXi or Hyper-V install directly on hardware for better performance \u2014 common in servers. Type 2 (hosted) hypervisors like VirtualBox run as an application on top of an existing OS \u2014 common for desktop use."},
+        { q:"What is VM sprawl?", opts:["A virus that targets virtual machines specifically","An uncontrolled proliferation of virtual machines that makes management, security, and resource tracking difficult","A method of encrypting VM disk images","A type of RAID used for VM storage"], correct:1,
+          exp:"VM sprawl happens when VMs are created faster than they're tracked or decommissioned, leading to wasted resources, forgotten unpatched systems, and security blind spots."},
+        { q:"Which resource allocation concept means a hypervisor promises more virtual resources to VMs than physically exist, betting they won't all be used at once?", opts:["Overprovisioning / oversubscription","Sandboxing","Snapshotting","Live migration"], correct:0,
+          exp:"Overprovisioning (oversubscription) allocates more virtual CPU/RAM across VMs than the host physically has, which works because VMs rarely hit peak usage simultaneously \u2014 but can cause contention if too aggressive."},
+        { q:"What is 'live migration' in a virtualized environment?", opts:["Moving a running VM from one physical host to another with minimal to no downtime","Copying a VM's files to a USB drive","Upgrading a VM's guest OS","Deleting an unused VM"], correct:0,
+          exp:"Live migration moves a running VM between physical hosts (for maintenance, load balancing, or hardware failure avoidance) while keeping it operational, typically with little to no perceptible downtime."}
+      ]},
+      { key:"virt-3", title:"Cloud & Virtualization in Practice", questions:[
+        { q:"What is VDI (Virtual Desktop Infrastructure) primarily used for?", opts:["Hosting desktop operating systems on a central server, accessed remotely by end users on thin clients or other devices","Encrypting desktop hard drives","Backing up individual laptops nightly","Managing printer queues centrally"], correct:0,
+          exp:"VDI centralizes desktop OS instances on servers, letting users connect remotely from thin clients or other devices \u2014 useful for centralized management, security, and supporting varied end-user hardware."},
+        { q:"Why is a hypervisor host typically provisioned with far more RAM and CPU cores than a single physical workstation would need?", opts:["Because it must share those resources across multiple simultaneous virtual machines","Because hypervisors require 10x the RAM of any OS","Because it's a marketing requirement, not a technical one","Because VMs don't actually use CPU resources"], correct:0,
+          exp:"Since a single host runs many VMs concurrently, its RAM and CPU need to cover the combined demand of all those guest systems, not just one workstation's worth."},
+        { q:"When multiple customers' VMs share the same physical host (multitenancy), what's the key security concern to guard against?", opts:["Improper isolation between VMs, where a hypervisor breakout could expose other tenants' data","VMs running out of IP addresses","VMs being too fast","Snapshots taking too much time to create"], correct:0,
+          exp:"The core risk in a shared-host environment is a VM escape/hypervisor breakout that lets one tenant's workload access another's \u2014 proper isolation is what keeps multitenancy safe."},
+        { q:"What does a VM snapshot let an administrator do?", opts:["Capture the exact state of a VM at a point in time to revert to later if needed","Permanently delete a VM","Increase a VM's allocated RAM automatically","Convert a VM into a physical machine"], correct:0,
+          exp:"A snapshot is a saved state of a VM's disk (and sometimes memory) at a specific moment, letting an admin roll back to that exact point \u2014 useful before risky changes like updates or config edits."},
+        { q:"What's a practical business advantage of cloud file synchronization services (like OneDrive or Google Drive) over local-only storage?", opts:["Files stay backed up and accessible across devices without manual transfer","They eliminate the need for any internet connection","They are always faster than local storage for every operation","They remove the need for any file permissions"], correct:0,
+          exp:"Cloud sync keeps a live, accessible copy of files across every device signed into the account, functioning as both convenience and an off-site backup \u2014 without the user having to manually copy files around."}
+      ]}
+    ]
+  },
+  {
+    key:"trouble", code:"220-1101 \u00b7 5.0", name:"Hardware & Network Troubleshooting",
+    lessons:[
+      { key:"tr-1", title:"Hardware Troubleshooting", questions:[
+        { q:"A desktop powers on (fans spin) but shows no video and produces a series of beeps. What should a technician check first?", opts:["Reinstall the OS immediately","Consult the motherboard's beep code documentation to identify the failing component (often RAM or GPU)","Replace the power supply","Reset the BIOS password"], correct:1,
+          exp:"POST beep codes are the motherboard's way of reporting a hardware failure before video is even initialized. The exact pattern (varies by BIOS vendor) usually points to RAM, GPU, or another core component \u2014 that's the first thing to decode, not a reinstall."},
+        { q:"A hard drive is making repeated clicking sounds and isn't detected in BIOS. What does this most likely indicate?", opts:["A loose SATA cable only, nothing else","Mechanical drive failure (common: read/write head issue)","Outdated drivers","A RAID misconfiguration"], correct:1,
+          exp:"Repeated clicking ('click of death') on a mechanical drive is a classic symptom of physical failure, often the read/write head failing to park or find data correctly \u2014 back up immediately if any data is still accessible."},
+        { q:"A system randomly reboots under load (e.g., gaming or heavy CPU tasks) but is stable at idle. What's a likely cause to investigate first?", opts:["Overheating (thermal shutdown) or an inadequate/failing power supply","The monitor's refresh rate","The Wi-Fi driver","Screen resolution settings"], correct:0,
+          exp:"Random reboots specifically under load point strongly toward thermal issues (CPU/GPU overheating and triggering a protective shutdown) or a power supply that can't sustain load \u2014 both are the standard first checks."},
+        { q:"After a RAM upgrade, a PC won't boot and gives no display. What's the first troubleshooting step?", opts:["Reformat the hard drive","Reseat the RAM modules and confirm they're in the correct slots per the motherboard manual","Replace the CPU","Update Windows"], correct:1,
+          exp:"Improperly seated RAM (or wrong slot population order) is the most common cause of a no-boot/no-display situation right after a RAM upgrade \u2014 reseating is the fast, non-destructive first step."},
+        { q:"A printer produces streaked or faded output on a laser printer. What's the most likely culprit?", opts:["Low or unevenly distributed toner in the cartridge, or a dirty/damaged drum","The network cable","The paper size setting","The USB port on the PC"], correct:0,
+          exp:"Streaking or fading on laser output is a classic toner/drum issue \u2014 either the cartridge is low and toner isn't distributing evenly, or the imaging drum has a defect. Network and USB issues wouldn't cause a print-quality symptom like this."}
+      ]},
+      { key:"tr-2", title:"Network Troubleshooting", questions:[
+        { q:"A user can reach internal file servers by IP address but not by name. What does this point toward?", opts:["A DNS resolution problem","A physical cable fault","A DHCP scope exhaustion issue","A duplex mismatch"], correct:0,
+          exp:"When IP access works but name-based access fails, that's the textbook signature of a DNS problem \u2014 the name isn't resolving to the (working) IP address."},
+        { q:"A new device on the network gets an APIPA address (169.254.x.x). What does this indicate?", opts:["The device successfully got an address from the DHCP server","The device could NOT reach a DHCP server and self-assigned a fallback address","The device is using a static IP correctly","The device has a MAC address conflict"], correct:1,
+          exp:"APIPA (169.254.x.x) is the fallback a device assigns itself when DHCP fails to respond \u2014 it signals a DHCP reachability problem, not a successful lease."},
+        { q:"Two devices on the same switch can't communicate, but both show 'connected' link lights. What's a reasonable next troubleshooting step?", opts:["Immediately replace the switch","Check VLAN assignments/port configuration on the switch \u2014 they may be on different VLANs","Reboot both computers only","Change both devices to static IPs with no other checks"], correct:1,
+          exp:"A link light just confirms physical connectivity, not that the devices can actually talk. Mismatched VLAN assignments on switch ports are a very common cause of 'connected but can't communicate' symptoms."},
+        { q:"Intermittent packet loss is traced to a specific patch cable. What tool would best confirm a cabling fault (like a bad crimp)?", opts:["Cable tester / certifier","Wi-Fi analyzer","Toner probe","Port scanner"], correct:0,
+          exp:"A cable tester (or a full certifier for more detail) checks continuity and wiring map, catching issues like miswires or bad crimps that cause intermittent loss \u2014 the toner probe is for tracing, not fault-testing."},
+        { q:"A laptop connects to Wi-Fi but has no internet access, while wired devices on the same network work fine. What's a good next step?", opts:["Replace the laptop's motherboard","Check the wireless AP's internet uplink/configuration and the laptop's IP/DNS settings specifically for the wireless adapter","Reinstall the OS","Assume the ISP is down for everyone"], correct:1,
+          exp:"Since wired devices work, the ISP/gateway itself is fine \u2014 the problem is isolated to the wireless path, so the wireless AP's configuration and the laptop's Wi-Fi adapter IP/DNS settings are exactly where to look next."}
+      ]},
+      { key:"tr-3", title:"Mobile/Printer Issues & Methodology", questions:[
+        { q:"What is the FIRST step in the standard CompTIA troubleshooting methodology?", opts:["Identify the problem (gather information from the user and system)","Immediately replace the suspected component","Document the resolution","Escalate to a senior technician"], correct:0,
+          exp:"The methodology always starts with identifying the problem \u2014 gathering information, questioning the user, and reproducing the issue if possible \u2014 before jumping to any theory or fix."},
+        { q:"After establishing a theory of probable cause, what is the very next step in the troubleshooting methodology?", opts:["Test the theory to determine the actual cause","Document the outcome","Close the ticket","Restart the device and hope it's fixed"], correct:0,
+          exp:"Once you have a theory, the next step is testing it \u2014 confirming (or ruling out) that theory before building a plan of action around it. Skipping this step leads to fixes aimed at the wrong problem."},
+        { q:"A mobile device won't power on even while plugged into a charger. What's a reasonable first troubleshooting step?", opts:["Assume the device is dead and order a replacement immediately","Try a different cable and a different outlet/charger to rule out a bad power source before assuming device failure","Factory reset the phone","Replace the screen"], correct:1,
+          exp:"A 'won't power on' symptom is frequently just a bad cable, charger, or outlet \u2014 ruling that out first is fast and non-destructive, compared to assuming full device failure right away."},
+        { q:"A phone's battery appears visibly swollen. What is the correct safety action?", opts:["Continue using it normally until it stops working","Stop using it immediately and have it professionally removed/replaced; do not puncture or continue charging it","Puncture it to release pressure","Put it in the freezer to reduce swelling"], correct:1,
+          exp:"A swollen battery is a real safety hazard (fire/chemical risk). The correct action is to stop use immediately and have it handled by a professional for safe removal and disposal \u2014 never puncture or keep charging it."},
+        { q:"An inkjet printer produces banding (visible horizontal lines) across printed pages. What's the likely cause?", opts:["Clogged print head nozzles needing a cleaning cycle","A bad network cable","Wrong paper size selected","Outdated PDF viewer"], correct:0,
+          exp:"Banding on inkjet output is a classic clogged-nozzle symptom \u2014 running the printer's built-in head-cleaning utility is the standard first fix before considering a cartridge or head replacement."},
+        { q:"Which step of the troubleshooting methodology is most often skipped in practice, despite being exam-relevant and important for future reference?", opts:["Documenting findings, actions taken, and the outcome","Identifying the problem","Testing the theory","Establishing a plan of action"], correct:0,
+          exp:"Documentation is the step people skip when they're busy, but it's what lets the next technician (or future you) understand what happened and how it was resolved \u2014 CompTIA treats it as a required final step, not optional."}
+      ]}
+    ]
+  }
+];
+
+// ---------- State ----------
+// Question allocation for the diagnostic mirrors the real 220-1101 exam blueprint weighting,
+// so a diagnostic score is actually representative rather than a random slice.
+const EXAM_WEIGHTS = { mobile:0.15, networking:0.20, hardware:0.25, virt:0.11, trouble:0.29 };
+const DIAGNOSTIC_SIZE = 20;
+
+let state = {
+  xp:0, streak:0, lastActiveDate:null,
+  domainStats:{}, // key -> {correct, total}
+  lessonDone:{},  // lessonKey -> true
+  diagnosticHistory:[], // [{date, pct, correct, total, domainPct}] newest first
+  screen:"home",
+  activeDomain:null, activeLesson:null,
+  quizQueue:[], quizIndex:0, quizAnswers:[], quizMode:"lesson", // 'lesson' | 'diagnostic'
+  selectedOpt:null, answered:false,
+  hint:null, hintLoading:false
+};
+
+async function loadState(){
+  try{
+    const raw = localStorage.getItem('aplus-progress');
+    if(raw){ const saved = JSON.parse(raw); state = Object.assign(state, saved, {screen:"home", quizQueue:[], quizIndex:0, quizAnswers:[], selectedOpt:null, answered:false, hint:null, hintLoading:false}); }
+  }catch(e){ /* no saved state yet */ }
+  if(!state.diagnosticHistory) state.diagnosticHistory = [];
+  render();
+}
+async function saveState(){
+  try{
+    const toSave = { xp:state.xp, streak:state.streak, lastActiveDate:state.lastActiveDate, domainStats:state.domainStats, lessonDone:state.lessonDone, diagnosticHistory:state.diagnosticHistory };
+    localStorage.setItem('aplus-progress', JSON.stringify(toSave));
+  }catch(e){ console.error('save failed', e); }
+}
+
+function todayStr(){ return new Date().toDateString(); }
+function bumpStreak(){
+  const today = todayStr();
+  if(state.lastActiveDate === today) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  if(state.lastActiveDate === y.toDateString()) state.streak += 1;
+  else state.streak = 1;
+  state.lastActiveDate = today;
+}
+
+function domainProgress(domain){
+  let total=0, done=0;
+  domain.lessons.forEach(l=>{ total++; if(state.lessonDone[l.key]) done++; });
+  return Math.round((done/total)*100);
+}
+function allQuestions(){
+  let qs=[];
+  DOMAINS.forEach(d=>d.lessons.forEach(l=>l.questions.forEach(q=>qs.push({...q, domainKey:d.key, domainName:d.name}))));
+  return qs;
+}
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function startLesson(domainKey, lessonKey){
+  const domain = DOMAINS.find(d=>d.key===domainKey);
+  const lesson = domain.lessons.find(l=>l.key===lessonKey);
+  state.activeDomain = domainKey; state.activeLesson = lessonKey;
+  state.quizQueue = lesson.questions.map(q=>({...q, domainKey}));
+  state.quizIndex = 0; state.quizAnswers = []; state.quizMode = "lesson";
+  state.selectedOpt=null; state.answered=false; state.hint=null;
+  state.screen = "quiz"; render();
+}
+function startDiagnostic(){
+  const keys = Object.keys(EXAM_WEIGHTS);
+  const counts = {}; let allocated = 0;
+  keys.forEach(k=>{ const c = Math.round(EXAM_WEIGHTS[k]*DIAGNOSTIC_SIZE); counts[k]=c; allocated+=c; });
+  const diff = DIAGNOSTIC_SIZE - allocated;
+  if(diff !== 0) counts[keys[keys.length-1]] += diff; // absorb any rounding drift on the last domain
+  const pool = allQuestions();
+  let qs = [];
+  keys.forEach(k=>{
+    const domainQs = pool.filter(q=>q.domainKey===k);
+    qs = qs.concat(shuffle(domainQs).slice(0, Math.min(counts[k], domainQs.length)));
+  });
+  qs = shuffle(qs);
+  state.quizQueue = qs; state.quizIndex=0; state.quizAnswers=[]; state.quizMode="diagnostic";
+  state.selectedOpt=null; state.answered=false; state.hint=null;
+  state.screen="quiz"; render();
+}
+
+function selectOption(i){
+  if(state.answered) return;
+  state.selectedOpt = i; state.answered = true;
+  const q = state.quizQueue[state.quizIndex];
+  const isCorrect = i === q.correct;
+  state.quizAnswers.push({domainKey:q.domainKey, correct:isCorrect, q:q, selected:i});
+  if(!state.domainStats[q.domainKey]) state.domainStats[q.domainKey] = {correct:0,total:0};
+  state.domainStats[q.domainKey].total++;
+  if(isCorrect){ state.domainStats[q.domainKey].correct++; state.xp += 10; bumpStreak(); }
+  saveState();
+  render();
+}
+
+function nextQuestion(){
+  state.selectedOpt=null; state.answered=false; state.hint=null;
+  if(state.quizIndex < state.quizQueue.length - 1){
+    state.quizIndex++; render();
+  } else {
+    if(state.quizMode === "lesson"){
+      state.lessonDone[state.activeLesson] = true;
+      saveState();
+    } else if(state.quizMode === "diagnostic"){
+      const total = state.quizAnswers.length;
+      const correct = state.quizAnswers.filter(a=>a.correct).length;
+      const pct = Math.round((correct/total)*100);
+      const byDomain = {};
+      state.quizAnswers.forEach(a=>{ if(!byDomain[a.domainKey]) byDomain[a.domainKey]={c:0,t:0}; byDomain[a.domainKey].t++; if(a.correct) byDomain[a.domainKey].c++; });
+      const domainPct = {};
+      Object.keys(byDomain).forEach(k=> domainPct[k] = Math.round((byDomain[k].c/byDomain[k].t)*100));
+      state.diagnosticHistory.unshift({ date:new Date().toISOString(), pct, correct, total, domainPct });
+      state.diagnosticHistory = state.diagnosticHistory.slice(0,10);
+      saveState();
+    }
+    state.screen = "results"; render();
+  }
+}
+
+async function askHint(){
+  const q = state.quizQueue[state.quizIndex];
+  state.hintLoading = true; render();
+  try{
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:200,
+        messages:[{ role:"user", content:
+          "You are a CompTIA A+ tutor. A student is stuck on this practice question. Give ONE short, Socratic hint (2-3 sentences max) that points them toward the right concept WITHOUT revealing the answer choice or directly naming the correct option text. Question: \""+q.q+"\" Options: "+q.opts.map((o,idx)=>String.fromCharCode(65+idx)+") "+o).join(", ")
+        }]
+      })
+    });
+    const data = await resp.json();
+    const textBlock = (data.content||[]).find(b=>b.type==="text");
+    state.hint = textBlock ? textBlock.text : "Couldn't get a hint right now \u2014 try reasoning through what each option actually does.";
+  }catch(e){
+    state.hint = "Hint service unavailable right now. Re-read the question and eliminate the options that don't match the core concept being tested.";
+  }
+  state.hintLoading = false; render();
+}
+
+function goHome(){ state.screen="home"; render(); }
+function openDomain(key){ state.activeDomain=key; state.screen="domain"; render(); }
+function openReview(){ state.screen="review"; render(); }
+function backToResults(){ state.screen="results"; render(); }
+function practiceWeakest(){
+  const last = state.diagnosticHistory[0];
+  if(!last) return goHome();
+  let weakestKey = null, weakestPct = 101;
+  Object.keys(last.domainPct).forEach(k=>{ if(last.domainPct[k] < weakestPct){ weakestPct = last.domainPct[k]; weakestKey = k; } });
+  if(weakestKey) openDomain(weakestKey); else goHome();
+}
+
+// ---------- Render ----------
+function esc(s){ const d=document.createElement('div'); d.innerText=s; return d.innerHTML; }
+
+function render(){
+  const root = document.getElementById('app-root');
+  let html = "";
+
+  if(state.screen === "home"){
+    const totalLessons = DOMAINS.reduce((a,d)=>a+d.lessons.length,0);
+    const doneLessons = Object.keys(state.lessonDone).length;
+    html += topbarHtml();
+    html += `<h1 class="title">Core 1 Trainer</h1><p class="subtitle">CompTIA A+ 220-1101 \u00b7 free & unlocked, no paywall</p>`;
+    html += `<div class="diag-cta" onclick="__aplus.startDiagnostic()">
+      <div class="label"><b>Run Diagnostic Test</b><span class="muted">20 questions, weighted to match the real exam blueprint</span></div>
+      <div class="arrow">&gt;_</div>
+    </div>`;
+    if(state.diagnosticHistory && state.diagnosticHistory.length){
+      const last = state.diagnosticHistory[0];
+      const prev = state.diagnosticHistory[1];
+      const dateStr = new Date(last.date).toLocaleDateString(undefined,{month:'short', day:'numeric'});
+      let trendHtml = '<span class="muted">first diagnostic on record</span>';
+      if(prev){
+        const delta = last.pct - prev.pct;
+        const sign = delta>=0 ? '+' : '';
+        trendHtml = `<span class="${delta>=0?'green':'amber'}">${sign}${delta}pt</span> <span class="muted">vs previous run</span>`;
+      }
+      html += `<div class="history-strip">
+        <div class="history-main"><b>${last.pct}%</b><span class="muted">last diagnostic \u00b7 ${dateStr}</span></div>
+        <div class="history-trend">${trendHtml}</div>
+      </div>`;
+    }
+    DOMAINS.forEach(d=>{
+      const pct = domainProgress(d);
+      const stat = state.domainStats[d.key];
+      const acc = stat && stat.total ? Math.round((stat.correct/stat.total)*100) : null;
+      html += `<div class="domain-card" onclick="__aplus.openDomain('${d.key}')">
+        <div class="domain-head">
+          <div><div class="domain-code">${d.code}</div><div class="domain-name">${d.name}</div></div>
+          <div class="domain-pct">${pct}%</div>
+        </div>
+        <div class="barwrap"><div class="barfill" style="width:${pct}%"></div></div>
+        <div class="domain-meta"><span>${d.lessons.length} lessons</span><span>${acc!==null ? 'accuracy '+acc+'%' : 'not started'}</span></div>
+      </div>`;
+    });
+    html += `<div class="empty-note">${doneLessons}/${totalLessons} lessons complete \u2014 keep going.</div>`;
+  }
+
+  else if(state.screen === "domain"){
+    const d = DOMAINS.find(x=>x.key===state.activeDomain);
+    html += topbarHtml();
+    html += `<button class="backbtn" onclick="__aplus.goHome()">&lt; back</button>`;
+    html += `<div class="domain-code">${d.code}</div><h1 class="title">${d.name}</h1><p class="subtitle">${d.lessons.length} lessons</p>`;
+    d.lessons.forEach(l=>{
+      const done = state.lessonDone[l.key];
+      html += `<div class="lesson-row" onclick="__aplus.startLesson('${d.key}','${l.key}')">
+        <div class="lesson-icon ${done?'done':'todo'}">${done?'\u2713':'\u25B8'}</div>
+        <div><div class="lesson-title">${l.title}</div><div class="lesson-sub">${l.questions.length} questions</div></div>
+      </div>`;
+    });
+  }
+
+  else if(state.screen === "quiz"){
+    const q = state.quizQueue[state.quizIndex];
+    const pct = Math.round(((state.quizIndex)/state.quizQueue.length)*100);
+    html += topbarHtml(true);
+    html += `<div class="progressbar-top"><div class="progressbar-top-fill" style="width:${pct}%"></div></div>`;
+    html += `<div class="qcard">
+      <div class="qmeta">QUESTION ${state.quizIndex+1} / ${state.quizQueue.length} ${state.quizMode==='diagnostic' ? '\u00b7 '+q.domainName : ''}</div>
+      <div class="qtext">${esc(q.q)}</div>
+    </div>`;
+    q.opts.forEach((opt,i)=>{
+      let cls = "opt";
+      if(state.answered){
+        if(i===q.correct) cls += " correct";
+        else if(i===state.selectedOpt) cls += " incorrect";
+        else cls += " faded";
+      }
+      html += `<button class="${cls}" ${state.answered?'disabled':''} onclick="__aplus.selectOption(${i})">${esc(opt)}</button>`;
+    });
+    if(!state.answered){
+      html += `<button class="hint-btn" onclick="__aplus.askHint()" ${state.hintLoading?'disabled':''}>${state.hintLoading?'thinking\u2026':'\ud83d\udca1 Ask for a hint'}</button>`;
+      if(state.hint) html += `<div class="hint-box">${esc(state.hint)}</div>`;
+    }
+    if(state.answered){
+      const isCorrect = state.selectedOpt === q.correct;
+      html += `<div class="feedback-banner ${isCorrect?'ok':'bad'}">${isCorrect?'CORRECT':'INCORRECT'}</div>`;
+      html += `<div class="explain-box"><b>Why:</b> ${esc(q.exp)}</div>`;
+      html += `<button class="primary-btn" onclick="__aplus.nextQuestion()">Continue</button>`;
+    }
+  }
+
+  else if(state.screen === "results"){
+    const total = state.quizAnswers.length;
+    const correct = state.quizAnswers.filter(a=>a.correct).length;
+    const pct = Math.round((correct/total)*100);
+    const circumference = 2*Math.PI*64;
+    const offset = circumference - (pct/100)*circumference;
+    html += topbarHtml();
+    html += `<h1 class="title">${state.quizMode==='diagnostic'?'Diagnostic Results':'Lesson Complete'}</h1>`;
+    html += `<div class="result-ring">
+      <svg width="150" height="150"><circle cx="75" cy="75" r="64" stroke="#1f2e1f" stroke-width="10" fill="none"/>
+      <circle cx="75" cy="75" r="64" stroke="#00FF41" stroke-width="10" fill="none" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"/></svg>
+      <div class="pct"><b>${pct}%</b><span>${correct}/${total} correct</span></div>
+    </div>`;
+    const missedCount = state.quizAnswers.filter(a=>!a.correct).length;
+    if(state.quizMode === "diagnostic"){
+      const prev = state.diagnosticHistory[1];
+      if(prev){
+        const delta = pct - prev.pct;
+        const sign = delta>=0 ? '+' : '';
+        html += `<div class="trend-line ${delta>=0?'green':'amber'}">${sign}${delta}pt vs your last diagnostic (${prev.pct}%)</div>`;
+      }
+      const byDomain = {};
+      state.quizAnswers.forEach(a=>{ if(!byDomain[a.domainKey]) byDomain[a.domainKey]={c:0,t:0}; byDomain[a.domainKey].t++; if(a.correct) byDomain[a.domainKey].c++; });
+      Object.keys(byDomain).forEach(k=>{
+        const d = DOMAINS.find(x=>x.key===k);
+        const p = Math.round((byDomain[k].c/byDomain[k].t)*100);
+        html += `<div class="breakdown-row clickable" onclick="__aplus.openDomain('${k}')"><span>${d.name}</span><span>${p<70?'<span class="weak">WEAK &middot; </span>':''}${p}%</span></div>`;
+      });
+      html += `<button class="ghost-btn" onclick="__aplus.practiceWeakest()">Practice weakest domain \u2192</button>`;
+    }
+    if(missedCount > 0){
+      html += `<button class="ghost-btn" onclick="__aplus.openReview()">Review ${missedCount} missed question${missedCount>1?'s':''}</button>`;
+    }
+    html += `<button class="primary-btn" onclick="__aplus.goHome()">Back to Dashboard</button>`;
+  }
+
+  else if(state.screen === "review"){
+    html += topbarHtml();
+    html += `<button class="backbtn" onclick="__aplus.backToResults()">&lt; back to results</button>`;
+    html += `<h1 class="title">Missed Questions</h1><p class="subtitle">Review why, not just what</p>`;
+    const missed = state.quizAnswers.filter(a=>!a.correct);
+    if(missed.length === 0){
+      html += `<div class="empty-note">Nothing missed \u2014 clean run.</div>`;
+    }
+    missed.forEach(a=>{
+      const d = DOMAINS.find(x=>x.key===a.domainKey);
+      html += `<div class="qcard">
+        <div class="qmeta">${d?d.name:''}</div>
+        <div class="qtext" style="margin-bottom:12px;">${esc(a.q.q)}</div>
+        <div class="review-line"><span class="muted">Your answer:</span> <span class="amber">${esc(a.q.opts[a.selected])}</span></div>
+        <div class="review-line"><span class="muted">Correct answer:</span> <span class="green">${esc(a.q.opts[a.q.correct])}</span></div>
+        <div class="explain-box" style="margin-top:12px;"><b>Why:</b> ${esc(a.q.exp)}</div>
+      </div>`;
+    });
+    html += `<button class="primary-btn" onclick="__aplus.goHome()">Back to Dashboard</button>`;
+  }
+
+  root.innerHTML = html;
+}
+
+function topbarHtml(minimal){
+  return `<div class="topbar">
+    <div class="brand"><span class="green">A+</span><span class="muted">_trainer</span><span class="cursor"></span></div>
+    <div class="stat-row">
+      <div class="stat-pill">\ud83d\udd25 <span class="amber">${state.streak}</span></div>
+      <div class="stat-pill">\u26a1 <span class="green">${state.xp}</span> XP</div>
+    </div>
+  </div>`;
+}
+
+window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest };
+loadState();
+})();
+</script>
+</body>
+</html>
