@@ -540,6 +540,11 @@ function goHome(){ state.screen="home"; render(); }
 function openDomain(key){ state.activeDomain=key; state.screen="domain"; render(); }
 function openReview(){ state.screen="review"; render(); }
 function backToResults(){ state.screen="results"; render(); }
+function exitQuiz(){
+  state.selectedOpt=null; state.answered=false; state.hint=null;
+  if(state.quizMode === "lesson" && state.activeDomain){ openDomain(state.activeDomain); }
+  else { goHome(); }
+}
 function practiceWeakest(){
   const last = state.diagnosticHistory[0];
   if(!last) return goHome();
@@ -613,6 +618,7 @@ function render(){
     const q = state.quizQueue[state.quizIndex];
     const pct = Math.round(((state.quizIndex)/state.quizQueue.length)*100);
     html += topbarHtml(true);
+    html += `<button class="backbtn" onclick="__aplus.exitQuiz()">&lt; exit ${state.quizMode==='diagnostic'?'diagnostic':'lesson'}</button>`;
     html += `<div class="progressbar-top"><div class="progressbar-top-fill" style="width:${pct}%"></div></div>`;
     html += `<div class="qcard">
       <div class="qmeta">QUESTION ${state.quizIndex+1} / ${state.quizQueue.length} ${state.quizMode==='diagnostic' ? '\u00b7 '+q.domainName : ''}</div>
@@ -709,7 +715,7 @@ function topbarHtml(minimal){
   </div>`;
 }
 
-window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest };
+window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest, exitQuiz };
 loadState();
 })();
 </script>
