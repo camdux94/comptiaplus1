@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Core 1 Trainer \u2014 CompTIA A+ 220-1101 Study App</title>
+<title>Core 1 Trainer \u2014 CompTIA A+ 220-1201 Study App</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#080b08">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -136,6 +136,8 @@
   .opt.correct{ border-color:var(--green); background:rgba(0,255,65,0.1); color:var(--green); }
   .opt.incorrect{ border-color:var(--red); background:rgba(255,68,68,0.08); color:#ff8080; }
   .opt.faded{ opacity:.45; }
+  .opt.selected{ border-color:var(--green); background:rgba(0,255,65,0.08); }
+  .opt.missed{ border-color:var(--amber); background:rgba(255,176,0,0.08); color:var(--amber); }
 
   .feedback-banner{ font-family:var(--mono); font-weight:700; font-size:13px; letter-spacing:.5px; margin-bottom:6px; }
   .feedback-banner.ok{ color:var(--green); }
@@ -201,7 +203,7 @@
 
 const DOMAINS = [
   {
-    key:"mobile", code:"220-1101 \u00b7 1.0", name:"Mobile Devices",
+    key:"mobile", code:"220-1201 \u00b7 1.0", name:"Mobile Devices",
     lessons:[
       { key:"mobile-1", title:"Laptop Hardware & Docking", questions:[
         { q:"A technician needs to replace a laptop's internal wireless card. What must be done immediately before removing the antenna leads?", opts:["Power off the laptop and disconnect it from AC power / remove the battery","Update the BIOS to the latest version","Boot into Safe Mode","Reinstall the wireless driver first"], correct:0,
@@ -314,7 +316,7 @@ const DOMAINS = [
     ]
   },
   {
-    key:"networking", code:"220-1101 \u00b7 2.0", name:"Networking",
+    key:"networking", code:"220-1201 \u00b7 2.0", name:"Networking",
     lessons:[
       { key:"net-1", title:"Ports & Protocols", questions:[
         { q:"Which port number is used by SSH?", opts:["TCP 21","TCP 22","TCP 23","UDP 22"], correct:1,
@@ -429,11 +431,39 @@ const DOMAINS = [
           exp:"802.1X requires a device to authenticate (often against a RADIUS server) before it's granted network access on a given port or SSID \u2014 common in enterprise environments to prevent unauthorized devices from simply plugging in or connecting."},
         { q:"What frequency bands do most modern dual-band Wi-Fi routers broadcast on?", opts:["2.4 GHz and 5 GHz","900 MHz and 1.8 GHz","3.6 GHz and 7.2 GHz only","Only 2.4 GHz, always"], correct:0,
           exp:"Dual-band routers broadcast on both 2.4 GHz (longer range, more interference, slower) and 5 GHz (shorter range, less interference, faster) \u2014 letting devices choose the band that best fits their situation."}
+      ]},
+      { key:"net-5", title:"DNS Records, Server Roles & PoE", questions:[
+        { q:"What does a DNS 'A' record map a hostname to?", opts:["An IPv4 address","An IPv6 address","A mail server","A text-based value"], correct:0,
+          exp:"An A record maps a hostname to an IPv4 address \u2014 the most basic and common DNS record type. Its counterpart for IPv6 is the AAAA record."},
+        { q:"What does a DNS 'AAAA' record map a hostname to?", opts:["An IPv6 address","An IPv4 address","A canonical alias","A mail exchanger"], correct:0,
+          exp:"AAAA records serve the same purpose as A records but for IPv6 addresses instead of IPv4 \u2014 the naming (four A's) is a nod to IPv6 addresses being four times the length of IPv4."},
+        { q:"What is the purpose of a DNS CNAME record?", opts:["Creates an alias pointing one hostname to another canonical hostname","Maps a hostname directly to an IP address","Specifies a domain's mail server","Stores arbitrary text data"], correct:0,
+          exp:"A CNAME (Canonical Name) record aliases one hostname to another \u2014 e.g., pointing 'www.example.com' to 'example.com' \u2014 rather than pointing directly to an IP address."},
+        { q:"What is the purpose of a DNS MX record?", opts:["Specifies which mail server(s) handle email for a domain","Maps a hostname to an IPv4 address","Stores SPF/DKIM text values","Aliases one hostname to another"], correct:0,
+          exp:"MX (Mail Exchanger) records tell other mail servers where to deliver email for a domain, including priority when multiple mail servers are listed."},
+        { q:"Which DNS record type is commonly used to publish SPF, DKIM, and DMARC values for email anti-spoofing?", opts:["TXT record","A record","CNAME record","MX record"], correct:0,
+          exp:"TXT records hold arbitrary text and are the standard place to publish SPF, DKIM, and DMARC values \u2014 all mechanisms for validating that email claiming to be from a domain is actually legitimate."},
+        { q:"What does SPF (Sender Policy Framework) help prevent?", opts:["Email spoofing, by specifying which mail servers are authorized to send email on behalf of a domain","Weak Wi-Fi passwords","DNS cache poisoning directly","Physical unauthorized network access"], correct:0,
+          exp:"SPF lists the mail servers authorized to send email for a domain in a DNS TXT record, so receiving servers can check whether an incoming message actually came from an approved source \u2014 a core anti-spoofing/anti-spam mechanism."},
+        { q:"What is the purpose of an NTP (Network Time Protocol) server?", opts:["Synchronizes clock time across devices on a network","Assigns IP addresses","Resolves hostnames to IP addresses","Filters spam email"], correct:0,
+          exp:"NTP servers keep device clocks synchronized across a network \u2014 important for things like certificate validation, log correlation, and authentication protocols that are sensitive to time drift (like Kerberos)."},
+        { q:"What does an AAA server (Authentication, Authorization, and Accounting) provide?", opts:["Verifies identity, controls what a user is allowed to do, and logs/tracks their activity","Only assigns IP addresses","Only serves as a DNS resolver","Only handles print job queuing"], correct:0,
+          exp:"AAA covers three related functions: Authentication (verifying who you are), Authorization (what you're allowed to do), and Accounting (logging what you did) \u2014 a foundational framework for enterprise network access control (e.g., RADIUS)."},
+        { q:"What is the purpose of a syslog server in a network environment?", opts:["Centrally collects and stores log messages from multiple devices for monitoring and troubleshooting","Provides DNS resolution","Distributes IP addresses","Filters spam email"], correct:0,
+          exp:"A syslog server centralizes logs from routers, switches, servers, and other devices in one place, making it far easier to monitor, correlate, and troubleshoot issues across a whole network instead of checking each device individually."},
+        { q:"What does PoE (Power over Ethernet) allow?", opts:["Delivering electrical power to a device (like an access point or camera) over the same Ethernet cable that carries data","Boosting Wi-Fi signal strength","Converting fiber signals to copper","Encrypting network traffic"], correct:0,
+          exp:"PoE lets devices like wireless access points, IP cameras, and VoIP phones receive power directly through their Ethernet cable, eliminating the need for a separate power outlet at each device's location."},
+        { q:"What's the difference between a PoE switch and a PoE injector?", opts:["A PoE switch has built-in PoE on its ports; an injector adds PoE capability to a non-PoE switch/cable run after the fact","They are the same device with different names","A PoE injector only works wirelessly","A PoE switch cannot deliver power at all"], correct:0,
+          exp:"A PoE-capable switch delivers power natively from its ports. A PoE injector is used when your existing switch doesn't support PoE \u2014 it's inserted in the cable run to add power without replacing the switch."},
+        { q:"What is the purpose of an ONT (Optical Network Terminal)?", opts:["Converts the optical fiber signal coming from the ISP into an electrical signal (Ethernet) usable by home/office equipment","Boosts a cellular signal","Filters spam email","Assigns static IP addresses"], correct:0,
+          exp:"An ONT sits at the demarcation point for a fiber internet connection, translating the optical signal into standard Ethernet that a router or switch can use \u2014 the fiber equivalent of a cable/DSL modem."},
+        { q:"What is the purpose of a network tap, as distinct from a mirrored switch port?", opts:["A physical device inserted inline on a cable to passively copy traffic for monitoring/analysis, without relying on switch configuration","A tool for crimping RJ45 connectors","A device that assigns DHCP leases","A wireless signal booster"], correct:0,
+          exp:"A network tap physically sits inline and passively duplicates traffic for a monitoring device, working independently of switch configuration \u2014 useful where you need guaranteed, configuration-independent visibility into traffic (e.g., security monitoring)."}
       ]}
     ]
   },
   {
-    key:"hardware", code:"220-1101 \u00b7 3.0", name:"Hardware",
+    key:"hardware", code:"220-1201 \u00b7 3.0", name:"Hardware",
     lessons:[
       { key:"hw-1", title:"Cables & Connectors", questions:[
         { q:"Which cable type is best suited for a run that needs to be run near heavy electrical interference (e.g., alongside power conduit)?", opts:["Unshielded twisted pair (UTP)","Shielded twisted pair (STP)","Standard coaxial without shielding","Any Cat5e cable"], correct:1,
@@ -546,11 +576,47 @@ const DOMAINS = [
           exp:"An HTPC sits in a living space where fan noise is much more noticeable during quiet movie scenes or music, so quiet cooling solutions are prioritized even if it means somewhat reduced peak performance headroom."},
         { q:"What is the typical role of a print server in a networked office environment?", opts:["Manages and queues print jobs from multiple users/computers to shared network printers","Physically prints all documents locally on itself","Only works with a single connected computer","Replaces the need for any printer drivers"], correct:0,
           exp:"A print server centralizes print job management \u2014 receiving jobs from multiple client computers, queuing them, and sending them to the appropriate shared printer \u2014 rather than each user connecting directly to each printer individually."}
+      ]},
+      { key:"hw-5", title:"Security Features, CPU Architecture & Power", questions:[
+        { q:"What is the primary purpose of a TPM (Trusted Platform Module)?", opts:["A dedicated hardware chip that securely stores cryptographic keys and supports features like full-disk encryption and Secure Boot","Boosts CPU clock speed","Provides supplemental GPU power","Cools the CPU more efficiently"], correct:0,
+          exp:"TPM is a hardware security chip that generates and stores cryptographic keys in a way that's very difficult to extract, underpinning features like BitLocker full-disk encryption and the Secure Boot chain of trust."},
+        { q:"What does Secure Boot protect against?", opts:["Unauthorized or malicious bootloaders/OS code from loading during system startup","Overheating during boot","RAM compatibility issues","Wi-Fi connection failures"], correct:0,
+          exp:"Secure Boot verifies that the bootloader and OS components loading at startup are signed and trusted, blocking unauthorized code (like some rootkits/bootkits) from hijacking the boot process."},
+        { q:"How does an HSM (Hardware Security Module) generally differ from a TPM?", opts:["An HSM is typically a more robust, often external/dedicated device for enterprise-scale cryptographic key management, while a TPM is a smaller chip built into a single system's motherboard","They are functionally identical in every way","A TPM is always more powerful than any HSM","HSMs are exclusively software-based, never hardware"], correct:0,
+          exp:"Both handle cryptographic keys securely, but an HSM is typically a more powerful, often standalone/network-attached device built for enterprise-scale key management, while a TPM is a smaller embedded chip serving a single system."},
+        { q:"What is the fundamental architectural difference between x86/x64 and ARM CPUs?", opts:["x86/x64 uses a CISC (Complex Instruction Set) design, common in traditional desktops/laptops, while ARM uses RISC (Reduced Instruction Set), often prioritizing power efficiency in mobile devices","They are identical instruction sets with different marketing names","ARM only exists in desktop computers","x86 is exclusively used in mobile phones"], correct:0,
+          exp:"x86/x64 (CISC) and ARM (RISC) represent different instruction set philosophies. ARM's simpler, more power-efficient design is why it dominates phones/tablets, while x86/x64 has traditionally dominated desktops/laptops \u2014 though that line has been blurring in recent years."},
+        { q:"What does a motherboard's input voltage switch (110\u2013120 VAC vs. 220\u2013240 VAC) on a power supply relate to?", opts:["Matching the PSU to the electrical standard of the country/region it's being used in","The wattage the PSU can output","The number of SATA power connectors available","The PSU's physical size"], correct:0,
+          exp:"Different countries/regions use different standard wall voltages (roughly 110-120V in North America, 220-240V elsewhere) \u2014 some PSUs have a physical switch to match this, while modern auto-switching PSUs detect and adjust automatically."},
+        { q:"What do the different output voltage rails (3.3V, 5V, 12V) on a PSU generally power?", opts:["Different components draw from different rails \u2014 e.g., 12V commonly feeds higher-draw components like the CPU/GPU, while 3.3V/5V feed lower-power circuits","All components use only the 12V rail","The rails are purely decorative and unused in modern systems","Only 3.3V is ever actually used"], correct:0,
+          exp:"A PSU outputs multiple regulated voltages because different components need different levels \u2014 modern high-draw components like CPUs and GPUs pull heavily from the 12V rail, while 3.3V/5V serve lower-power circuits."},
+        { q:"What is the benefit of a redundant power supply configuration in a server?", opts:["If one PSU fails, a second one keeps the server running without downtime","It doubles the server's total wattage capacity always","It reduces the number of power cables needed","It eliminates the need for surge protection"], correct:0,
+          exp:"A redundant PSU setup has a backup power supply ready to take over instantly if the primary fails, keeping a critical server running without interruption \u2014 a reliability feature, not primarily a capacity boost."},
+        { q:"What is the main advantage of a modular power supply over a non-modular one?", opts:["Only the cables actually needed are connected, improving airflow and cable management by eliminating unused bundled cables","It always produces more wattage than a non-modular PSU","It eliminates the need for any power cables","It is required for the PSU to function at all"], correct:0,
+          exp:"A modular PSU lets you attach only the specific cables your build needs, rather than having every possible cable permanently bundled and stuffed into the case \u2014 cleaner airflow and easier cable management as a result."}
+      ]},
+      { key:"hw-6", title:"Printer Deployment & Maintenance", questions:[
+        { q:"What is the key difference between PCL and PostScript printer languages?", opts:["Both describe how a document should be rendered for printing, with PostScript historically favored for precise graphics/publishing work and PCL common for general business printing","PCL is used only for scanners, never printers","PostScript only works with inkjet printers","They are identical languages with different names"], correct:0,
+          exp:"Both are page description languages telling a printer how to render a document, but PostScript has traditionally been favored in graphic design/publishing for its precision with complex graphics, while PCL is a common general-purpose standard in business printing."},
+        { q:"What is the purpose of 'secured' or 'pull' printing, often involving badging at the printer?", opts:["Print jobs are held until the authorized user authenticates at the printer (e.g., with a badge), preventing sensitive documents from sitting unclaimed in the output tray","It speeds up print job processing","It reduces toner usage","It only applies to color printing"], correct:0,
+          exp:"Secured/pull printing holds a job in queue until the user authenticates directly at the printer (badge, PIN, etc.), which prevents confidential documents from sitting exposed in a shared output tray for anyone to grab."},
+        { q:"What's the difference between scanning to email and scanning to SMB from a multifunction printer?", opts:["Scan-to-email sends the scanned file as an email attachment; scan-to-SMB saves it directly to a shared network folder","They are the same destination with different names","Scan-to-SMB only works with cloud storage","Scan-to-email requires no network connection"], correct:0,
+          exp:"Scan-to-email delivers the scanned document as an email attachment to a specified address, while scan-to-SMB writes the file directly into a shared network folder \u2014 different delivery methods for the same core scanning function."},
+        { q:"What's the difference between an ADF (Automatic Document Feeder) and a flatbed scanner?", opts:["An ADF automatically feeds multiple pages through for scanning one at a time; a flatbed requires manually placing one page (or book) on a glass surface","A flatbed can only scan one page ever, then must be replaced","An ADF requires no paper at all","They are functionally identical"], correct:0,
+          exp:"An ADF is built for scanning multi-page documents efficiently by automatically pulling each sheet through, while a flatbed is better suited to single pages, delicate documents, or things like bound books that can't go through a feeder."},
+        { q:"What does laser printer maintenance typically involve when a maintenance kit is applied?", opts:["Replacing key wear components like the fuser assembly and rollers that degrade with heavy use over time","Replacing the entire printer","Only refilling toner, nothing else","Cleaning the network cable"], correct:0,
+          exp:"Laser printer maintenance kits typically include replacement fuser assemblies and rollers \u2014 parts that wear out from the heat and mechanical stress of the printing process over tens of thousands of pages, separate from simply swapping toner."},
+        { q:"What are common inkjet printer maintenance tasks beyond just replacing ink cartridges?", opts:["Cleaning clogged printheads, calibrating print alignment, and clearing paper jams from the roller/feeder mechanism","Replacing the entire logic board every time ink runs low","Applying thermal paste to the printhead","Reformatting the printer's internal drive"], correct:0,
+          exp:"Inkjet maintenance regularly involves printhead cleaning cycles (to clear clogs), alignment calibration, and clearing jams from the paper feed mechanism \u2014 not just swapping cartridges when they run dry."},
+        { q:"What maintenance concern is specific to thermal printers that isn't relevant to laser or inkjet?", opts:["Keeping the heating element clean and using the correct special thermal paper, since standard paper won't work with the heat-based printing process","Replacing toner cartridges","Cleaning the print head with alcohol wipes only","Applying thermal paste"], correct:0,
+          exp:"Thermal printers create images by applying heat to specially coated paper \u2014 they don't use ink or toner at all, so their maintenance instead centers on keeping the heating element clean and ensuring the correct thermal paper is loaded."},
+        { q:"What is a defining maintenance task for impact (dot-matrix) printers, given their mechanical printing method?", opts:["Periodically replacing the ink ribbon and printhead, since they physically strike the ribbon against paper", "Cleaning a laser drum","Refilling liquid ink cartridges","Replacing a heating element"], correct:0,
+          exp:"Impact printers physically strike pins against an ink ribbon to create the image, so their ribbon wears out and needs periodic replacement, along with the printhead itself over the printer's mechanical lifespan \u2014 a very different maintenance profile from laser/inkjet/thermal."}
       ]}
     ]
   },
   {
-    key:"virt", code:"220-1101 \u00b7 4.0", name:"Virtualization & Cloud",
+    key:"virt", code:"220-1201 \u00b7 4.0", name:"Virtualization & Cloud",
     lessons:[
       { key:"virt-1", title:"Cloud Concepts", questions:[
         { q:"Which cloud model combines on-premises infrastructure with resources accessed over the internet?", opts:["Private cloud","Public cloud","Hybrid cloud","Community cloud"], correct:2,
@@ -651,7 +717,7 @@ const DOMAINS = [
     ]
   },
   {
-    key:"trouble", code:"220-1101 \u00b7 5.0", name:"Hardware & Network Troubleshooting",
+    key:"trouble", code:"220-1201 \u00b7 5.0", name:"Hardware & Network Troubleshooting",
     lessons:[
       { key:"tr-1", title:"Hardware Troubleshooting", questions:[
         { q:"A desktop powers on (fans spin) but shows no video and produces a series of beeps. What should a technician check first?", opts:["Reinstall the OS immediately","Consult the motherboard's beep code documentation to identify the failing component (often RAM or GPU)","Replace the power supply","Reset the BIOS password"], correct:1,
@@ -675,7 +741,15 @@ const DOMAINS = [
         { q:"A laptop's battery shows as 'plugged in, not charging' in the OS. What's a reasonable troubleshooting step before assuming battery failure?", opts:["Try a different known-good AC adapter/cable and check for loose charging port connections","Immediately replace the motherboard","Reinstall the operating system","Assume it always means the battery is dead"], correct:0,
           exp:"'Plugged in, not charging' can stem from a faulty adapter, damaged cable, or loose charging port connection just as easily as actual battery failure \u2014 ruling out the cheaper, simpler causes first is the efficient approach."},
         { q:"A desktop intermittently loses network connectivity, but the cable and switch port both test fine. What else is worth checking?", opts:["The network adapter's driver and physical NIC connection/seating, since intermittent issues can stem from the adapter itself","Assume the ISP is always at fault","Replace the entire motherboard immediately","Reformat the hard drive"], correct:0,
-          exp:"When the cabling and switch port check out fine, the next reasonable suspect is the NIC itself \u2014 a flaky driver, loose card seating (if it's an add-in card), or a failing onboard adapter can all cause intermittent connectivity that's easy to misattribute elsewhere."}
+          exp:"When the cabling and switch port check out fine, the next reasonable suspect is the NIC itself \u2014 a flaky driver, loose card seating (if it's an add-in card), or a failing onboard adapter can all cause intermittent connectivity that's easy to misattribute elsewhere."},
+        { q:"What does S.M.A.R.T. (Self-Monitoring, Analysis, and Reporting Technology) do for a drive?", opts:["Monitors internal drive health indicators and can warn of impending failure before it happens","Encrypts the drive automatically","Increases the drive's read/write speed","Compresses stored data"], correct:0,
+          exp:"S.M.A.R.T. tracks internal health metrics (reallocated sectors, temperature, etc.) and can flag a drive as likely to fail soon \u2014 giving a warning window to back up and replace it before a hard failure occurs."},
+        { q:"A RAID array shows as 'degraded' rather than fully healthy. What does this indicate?", opts:["One or more drives in the array have failed or dropped out, and the array is running without its full redundancy until repaired","The array is running at maximum performance","No action is needed since 'degraded' is a normal steady state","The array has been deleted"], correct:0,
+          exp:"A degraded RAID array means it's lost some of its redundancy (a drive has failed or disconnected) but is still operating on the remaining drives \u2014 it needs prompt attention (replacing the failed drive and rebuilding) before a second failure causes actual data loss."},
+        { q:"A system reports unusually low IOPS (input/output operations per second) on a storage array. What does this generally point to?", opts:["A storage performance bottleneck \u2014 possibly a failing drive, an overloaded array, or a misconfiguration limiting throughput","A RAM upgrade is needed","The monitor's refresh rate is too low","The CPU's clock speed is too high"], correct:0,
+          exp:"IOPS measures how many read/write operations storage can handle per second; unusually low IOPS points to a storage-level bottleneck \u2014 a struggling/failing drive, an overloaded array, or a configuration issue \u2014 rather than a CPU or display problem."},
+        { q:"A desktop's system clock keeps resetting to an incorrect date/time every time it's powered off, even after being corrected. What's the most likely cause?", opts:["A dead or dying CMOS battery on the motherboard","A corrupted operating system installation","A failing power supply","A damaged network cable"], correct:0,
+          exp:"The CMOS battery keeps the real-time clock (and BIOS settings) alive when the system is unplugged; when it dies, the clock reverts to a default/incorrect time every time power is removed \u2014 a classic, easy-to-diagnose symptom."}
       ]},
       { key:"tr-2", title:"Network Troubleshooting", questions:[
         { q:"A user can reach internal file servers by IP address but not by name. What does this point toward?", opts:["A DNS resolution problem","A physical cable fault","A DHCP scope exhaustion issue","A duplex mismatch"], correct:0,
@@ -699,7 +773,15 @@ const DOMAINS = [
         { q:"A remote worker's VPN connection keeps dropping every few minutes. What's a reasonable early troubleshooting step?", opts:["Check the stability of their underlying internet connection and whether their local Wi-Fi signal is strong/consistent","Assume the VPN server itself is always the cause without checking anything client-side","Replace their computer entirely","Disable their firewall permanently"], correct:0,
           exp:"An unstable underlying internet connection or weak Wi-Fi signal is a very common cause of a VPN tunnel repeatedly dropping, since the VPN depends on a continuous connection beneath it \u2014 checking the client-side network first is efficient before assuming a server-side issue."},
         { q:"Two networked printers intermittently become unreachable, and investigation shows their IP addresses keep changing unexpectedly. What's a likely fix?", opts:["Configure DHCP reservations (or static IPs) for the printers so their addresses stay consistent","Replace both printers with new hardware","Disable DHCP for the entire network","This is expected normal behavior and needs no fix"], correct:0,
-          exp:"Devices like printers that other systems need to reliably find at a consistent address are good candidates for a DHCP reservation (or static IP) \u2014 preventing the lease-renewal-driven address changes that would otherwise break saved connections pointing to the old IP."}
+          exp:"Devices like printers that other systems need to reliably find at a consistent address are good candidates for a DHCP reservation (or static IP) \u2014 preventing the lease-renewal-driven address changes that would otherwise break saved connections pointing to the old IP."},
+        { q:"Users report choppy audio and 'robotic' voice quality during VoIP calls, even though overall internet speed tests look fine. What is this symptom most likely describing?", opts:["Jitter \u2014 inconsistent packet arrival timing, which is especially disruptive for real-time audio/video even when raw bandwidth is adequate","A DNS resolution failure","A duplicate IP address conflict","A completely dead network connection"], correct:0,
+          exp:"Jitter (variation in packet arrival timing) is a classic cause of choppy, robotic-sounding VoIP calls \u2014 a connection can have plenty of raw bandwidth and still sound terrible if packets aren't arriving at a consistent, steady rate."},
+        { q:"A switch port shows as repeatedly going up and down in the logs ('port flapping'). What does this typically indicate?", opts:["An unstable physical connection (bad cable, loose connector, or failing NIC/port) causing the link to repeatedly drop and reconnect","Normal, expected behavior requiring no investigation","A DNS misconfiguration","A successful firmware update in progress"], correct:0,
+          exp:"Port flapping (the link repeatedly going up/down) points to a physical-layer problem \u2014 a damaged cable, a loose connector, or a failing NIC/switch port \u2014 rather than anything at the configuration or software layer."},
+        { q:"Multiple users report authentication failures when trying to log into network resources, despite entering correct credentials. What's a reasonable early check, beyond assuming user error?", opts:["Whether the authentication server (e.g., domain controller/RADIUS) or its time sync (NTP) is functioning correctly, since some auth protocols are time-sensitive","Assume every affected user simply forgot their password","Immediately reset every user's password without investigation","Replace all network cables"], correct:0,
+          exp:"Widespread authentication failures across multiple users point away from individual user error and toward the authentication infrastructure itself \u2014 including checking whether time sync is off, since protocols like Kerberos are sensitive to clock drift between systems."},
+        { q:"A remote office reports consistently high latency (but not a fully dead connection) to the main office's servers. What's a reasonable early diagnostic step?", opts:["Use tracert/traceroute to identify which hop along the path is introducing the delay","Assume the servers themselves are always broken without checking the path","Replace the remote office's switch immediately","Disable the firewall to rule it out permanently"], correct:0,
+          exp:"High latency (as opposed to no connectivity at all) benefits from tracing the actual path \u2014 traceroute reveals which specific hop is introducing the delay, narrowing down whether the problem is local, at the ISP, or somewhere on the path to the destination."}
       ]},
       { key:"tr-3", title:"Mobile/Printer Issues & Methodology", questions:[
         { q:"What is the FIRST step in the standard CompTIA troubleshooting methodology?", opts:["Identify the problem (gather information from the user and system)","Immediately replace the suspected component","Document the resolution","Escalate to a senior technician"], correct:0,
@@ -723,7 +805,35 @@ const DOMAINS = [
         { q:"A laser printer jams frequently with a specific paper type, but not with others. What's the most likely explanation?", opts:["The paper weight/type isn't compatible with that printer's specifications","The network cable is faulty","The toner cartridge is empty","The USB port is damaged"], correct:0,
           exp:"Frequent jams tied to one specific paper type (rather than happening randomly with any paper) strongly suggest that paper's weight, finish, or size falls outside what that printer model is rated to handle reliably."},
         { q:"A user's mobile device is overheating during normal use, not just gaming or heavy tasks. What's a reasonable step before assuming hardware failure?", opts:["Check for a runaway background app/process consuming excessive CPU, and confirm the OS is up to date","Immediately replace the device","Assume it's always a battery defect","Ignore it since phones are expected to run hot constantly"], correct:0,
-          exp:"Overheating during otherwise-normal use often traces back to a misbehaving app stuck in a high-CPU loop in the background, or an OS bug fixed in a later update \u2014 worth ruling out before assuming a hardware fault."}
+          exp:"Overheating during otherwise-normal use often traces back to a misbehaving app stuck in a high-CPU loop in the background, or an OS bug fixed in a later update \u2014 worth ruling out before assuming a hardware fault."},
+        { q:"A phone was recently dropped in water. What is the correct immediate first step?", opts:["Power it off immediately (if not already off) and do not attempt to charge it until it's confirmed dry", "Immediately plug it in to charge to test if it still works","Place it directly in direct sunlight to dry quickly","Turn it on repeatedly to check functionality"], correct:0,
+          exp:"Liquid damage risk comes largely from powered/charging components shorting in the presence of moisture \u2014 powering off immediately and avoiding charging until it's confirmed dry minimizes further damage, rather than testing power or applying heat."},
+        { q:"A mobile device shows unexpected pop-up ads, rapid battery drain, and unfamiliar apps the user doesn't remember installing. What do these symptoms together suggest?", opts:["Possible malware infection","A normal software update in progress","A hardware antenna failure","A digitizer calibration issue"], correct:0,
+          exp:"That combination \u2014 unwanted ads, unexplained battery drain, and unfamiliar apps \u2014 is a classic malware symptom cluster on mobile devices, warranting a security scan and review of installed apps/permissions."},
+        { q:"A phone's charging port appears bent or has visible debris, and the device charges only intermittently when the cable is wiggled. What does this point to?", opts:["A physically damaged charging port, likely needing cleaning or hardware repair","A software update issue only","A malware infection","A digitizer failure"], correct:0,
+          exp:"Intermittent charging tied to cable position, combined with visible physical damage/debris in the port, points strongly to a physical port issue rather than a software problem \u2014 worth trying a careful cleaning first, then hardware repair if that doesn't resolve it."},
+        { q:"A user can't install new apps on their phone, receiving an error, even though other functions work normally. What's a reasonable early check?", opts:["Available storage space and whether the device's OS version meets the app's minimum requirements","Assume the phone's screen is broken","Replace the battery","Assume it's always a carrier-level restriction"], correct:0,
+          exp:"Failure to install new apps is very commonly caused by insufficient storage space or an OS version that's too old for the app's requirements \u2014 both quick, non-destructive checks before assuming something more serious."}
+      ]},
+      { key:"tr-5", title:"Display, Projector & Printer Symptoms", questions:[
+        { q:"A projector displays a completely blank/dark image, though it powers on and fans are running. What's a common cause to check first?", opts:["A burnt-out projector bulb/lamp","The projector's Wi-Fi settings","The room's ambient lighting","The HDMI cable's color"], correct:0,
+          exp:"A projector that powers on normally (fans running, unit responsive) but produces no image is a classic sign of a burnt-out bulb/lamp \u2014 a consumable that has a limited rated lifespan and needs periodic replacement."},
+        { q:"A monitor shows a faint, persistent ghost image of previously displayed content, even after changing to a different screen. What is this symptom called?", opts:["Display burn-in / image persistence","Dead pixel","Incorrect color display","Screen flickering"], correct:0,
+          exp:"Burn-in (or image persistence on less severe/temporary cases) happens when static content displayed for long periods leaves a lingering ghost image \u2014 more of a risk on OLED but historically also seen on plasma and some LCD panels."},
+        { q:"What is a 'dead pixel' on a display?", opts:["A single pixel that fails to light up or display color correctly, remaining a fixed black or wrong-colored dot","A pixel that's brighter than the rest of the screen","A term for the entire screen being unresponsive","A software setting, not a hardware issue"], correct:0,
+          exp:"A dead pixel is an individual pixel on the display that's failed and stuck showing black (or occasionally a stuck color), visible as a tiny fixed dot regardless of what's on screen \u2014 a hardware panel defect, not fixable through software."},
+        { q:"A presenter connects a laptop to a projector via HDMI, but the projector shows 'no signal' even though the laptop is on. What's a likely first step?", opts:["Confirm the projector's input source is set to the correct HDMI port being used","Assume the projector's bulb has burnt out","Replace the projector entirely","Assume the laptop's motherboard has failed"], correct:0,
+          exp:"Projectors with multiple input ports need the correct source manually selected \u2014 'no signal' is very often simply the projector set to look at the wrong input, a quick fix compared to assuming hardware failure."},
+        { q:"A laser printer produces a document with a repeating pattern of speckling/spots at regular intervals down the page. What does this suggest?", opts:["A dirty or damaged drum, since the pattern often repeats based on the drum's circumference","The network cable is faulty","The paper size is set incorrectly","The USB cable needs replacing"], correct:0,
+          exp:"A speckling pattern that repeats at a consistent interval down the page is a signature symptom of a damaged or dirty drum \u2014 the interval often corresponds to the drum's circumference as it rotates through each print cycle."},
+        { q:"A laser printer produces a faint 'echo' or double image of the printed content slightly offset from the original. What's a likely cause?", opts:["A drum or fuser issue causing incomplete toner transfer/fusing in one pass","The paper tray is empty","The scanner glass is dirty","The Wi-Fi signal is weak"], correct:0,
+          exp:"Double/echo images are a classic drum or fuser problem \u2014 something in the transfer or fusing process isn't completing cleanly in a single pass, leaving a faint ghost of the image offset from the main print."},
+        { q:"A printer repeatedly experiences multipage misfeeds, pulling more than one sheet through at a time. What's a likely cause?", opts:["Paper stuck together (static, humidity, or worn separation rollers) not being properly separated one sheet at a time","The toner cartridge is empty","The network cable is unplugged","The print driver is outdated"], correct:0,
+          exp:"Multipage misfeeds usually come down to the paper-separation mechanism failing to do its job \u2014 worn separation rollers, humidity causing sheets to stick together, or overfilled trays are the common culprits."},
+        { q:"A print job appears stuck and no other jobs will print after it, even though the printer itself shows as online. What's a reasonable troubleshooting step?", opts:["Clear the frozen/stuck job from the print queue and restart the print spooler service if needed","Replace the printer entirely","Assume the network is completely down","Reformat the print server"], correct:0,
+          exp:"A single stuck job can block an entire print queue behind it \u2014 clearing that specific job (and restarting the print spooler service if it won't clear normally) is the standard fix before assuming broader failure."},
+        { q:"A printer's paper tray shows as 'not recognized' by the print system, even though paper is loaded correctly. What's a reasonable early check?", opts:["Whether the tray is properly seated/inserted and the tray sensor isn't obstructed or dirty","Assume the entire printer needs replacing","Assume the network cable is at fault","Replace the toner cartridge"], correct:0,
+          exp:"A 'tray not recognized' error is often a mechanical issue \u2014 the tray not being fully seated, or a sensor that detects tray presence being dirty/obstructed \u2014 rather than anything at the network or software level."}
       ]},
       { key:"tr-4", title:"Safety, Symptoms & Escalation", questions:[
         { q:"A PC starts emitting a burning smell. What should a technician do FIRST, before any other troubleshooting step?", opts:["Immediately power off and unplug the system for safety, before investigating further","Continue running diagnostics to identify the exact cause","Open the case while it's still powered on to look inside","Ignore it if the computer still boots"], correct:0,
@@ -754,7 +864,7 @@ const DOMAINS = [
 ];
 
 // ---------- State ----------
-// Question allocation for the diagnostic mirrors the real 220-1101 exam blueprint weighting,
+// Question allocation for the diagnostic mirrors the real 220-1201 exam blueprint weighting,
 // so a diagnostic score is actually representative rather than a random slice.
 const EXAM_WEIGHTS = { mobile:0.15, networking:0.20, hardware:0.25, virt:0.11, trouble:0.29 };
 const DIAGNOSTIC_SIZE = 20;
@@ -768,6 +878,7 @@ let state = {
   activeDomain:null, activeLesson:null,
   quizQueue:[], quizIndex:0, quizAnswers:[], quizMode:"lesson", // 'lesson' | 'diagnostic'
   selectedOpt:null, answered:false,
+  selectedOpts:[], // for multi-select questions
   hint:null, hintLoading:false,
   modal:null // null | 'streak' | 'xp'
 };
@@ -775,7 +886,7 @@ let state = {
 async function loadState(){
   try{
     const raw = localStorage.getItem('aplus-progress');
-    if(raw){ const saved = JSON.parse(raw); state = Object.assign(state, saved, {screen:"home", quizQueue:[], quizIndex:0, quizAnswers:[], selectedOpt:null, answered:false, hint:null, hintLoading:false, modal:null}); }
+    if(raw){ const saved = JSON.parse(raw); state = Object.assign(state, saved, {screen:"home", quizQueue:[], quizIndex:0, quizAnswers:[], selectedOpt:null, selectedOpts:[], answered:false, hint:null, hintLoading:false, modal:null}); }
   }catch(e){ /* no saved state yet */ }
   if(!state.diagnosticHistory) state.diagnosticHistory = [];
   if(!state.longestStreak) state.longestStreak = state.streak || 0;
@@ -817,7 +928,7 @@ function startLesson(domainKey, lessonKey){
   state.activeDomain = domainKey; state.activeLesson = lessonKey;
   state.quizQueue = lesson.questions.map(q=>({...q, domainKey}));
   state.quizIndex = 0; state.quizAnswers = []; state.quizMode = "lesson";
-  state.selectedOpt=null; state.answered=false; state.hint=null;
+  state.selectedOpt=null; state.answered=false; state.hint=null; state.selectedOpts=[];
   state.screen = "quiz"; render();
 }
 function startDiagnostic(){
@@ -834,14 +945,15 @@ function startDiagnostic(){
   });
   qs = shuffle(qs);
   state.quizQueue = qs; state.quizIndex=0; state.quizAnswers=[]; state.quizMode="diagnostic";
-  state.selectedOpt=null; state.answered=false; state.hint=null;
+  state.selectedOpt=null; state.answered=false; state.hint=null; state.selectedOpts=[];
   state.screen="quiz"; render();
 }
 
 function selectOption(i){
   if(state.answered) return;
-  state.selectedOpt = i; state.answered = true;
   const q = state.quizQueue[state.quizIndex];
+  if(q.multi) return; // multi-select questions use toggleMultiOption + submitMultiAnswer instead
+  state.selectedOpt = i; state.answered = true;
   const isCorrect = i === q.correct;
   state.quizAnswers.push({domainKey:q.domainKey, correct:isCorrect, q:q, selected:i});
   if(!state.domainStats[q.domainKey]) state.domainStats[q.domainKey] = {correct:0,total:0};
@@ -851,8 +963,31 @@ function selectOption(i){
   render();
 }
 
+function toggleMultiOption(i){
+  if(state.answered) return;
+  const idx = state.selectedOpts.indexOf(i);
+  if(idx === -1) state.selectedOpts.push(i);
+  else state.selectedOpts.splice(idx, 1);
+  render();
+}
+
+function submitMultiAnswer(){
+  if(state.answered || state.selectedOpts.length === 0) return;
+  const q = state.quizQueue[state.quizIndex];
+  state.answered = true;
+  const selectedSorted = [...state.selectedOpts].sort();
+  const correctSorted = [...q.correct].sort();
+  const isCorrect = selectedSorted.length === correctSorted.length && selectedSorted.every((v,idx)=>v===correctSorted[idx]);
+  state.quizAnswers.push({domainKey:q.domainKey, correct:isCorrect, q:q, selectedMulti:[...state.selectedOpts]});
+  if(!state.domainStats[q.domainKey]) state.domainStats[q.domainKey] = {correct:0,total:0};
+  state.domainStats[q.domainKey].total++;
+  if(isCorrect){ state.domainStats[q.domainKey].correct++; state.xp += 10; bumpStreak(); }
+  saveState();
+  render();
+}
+
 function nextQuestion(){
-  state.selectedOpt=null; state.answered=false; state.hint=null;
+  state.selectedOpt=null; state.answered=false; state.hint=null; state.selectedOpts=[];
   if(state.quizIndex < state.quizQueue.length - 1){
     state.quizIndex++; render();
   } else {
@@ -904,7 +1039,7 @@ function openDomain(key){ state.activeDomain=key; state.screen="domain"; render(
 function openReview(){ state.screen="review"; render(); }
 function backToResults(){ state.screen="results"; render(); }
 function exitQuiz(){
-  state.selectedOpt=null; state.answered=false; state.hint=null;
+  state.selectedOpt=null; state.answered=false; state.hint=null; state.selectedOpts=[];
   if(state.quizMode === "lesson" && state.activeDomain){ openDomain(state.activeDomain); }
   else { goHome(); }
 }
@@ -929,7 +1064,7 @@ function render(){
     const totalLessons = DOMAINS.reduce((a,d)=>a+d.lessons.length,0);
     const doneLessons = Object.keys(state.lessonDone).length;
     html += topbarHtml();
-    html += `<h1 class="title">Core 1 Trainer</h1><p class="subtitle">CompTIA A+ 220-1101</p>`;
+    html += `<h1 class="title">Core 1 Trainer</h1><p class="subtitle">CompTIA A+ 220-1201</p>`;
     html += `<div class="diag-cta" onclick="__aplus.startDiagnostic()">
       <div class="label"><b>Run Diagnostic Test</b><span class="muted">20 questions, weighted to match the real exam blueprint</span></div>
       <div class="arrow">&gt;_</div>
@@ -986,27 +1121,56 @@ function render(){
     html += `<button class="backbtn" onclick="__aplus.exitQuiz()">&lt; exit ${state.quizMode==='diagnostic'?'diagnostic':'lesson'}</button>`;
     html += `<div class="progressbar-top"><div class="progressbar-top-fill" style="width:${pct}%"></div></div>`;
     html += `<div class="qcard">
-      <div class="qmeta">QUESTION ${state.quizIndex+1} / ${state.quizQueue.length} ${state.quizMode==='diagnostic' ? '\u00b7 '+q.domainName : ''}</div>
+      <div class="qmeta">QUESTION ${state.quizIndex+1} / ${state.quizQueue.length} ${state.quizMode==='diagnostic' ? '\u00b7 '+q.domainName : ''}${q.multi ? ' \u00b7 SELECT '+q.correct.length : ''}</div>
       <div class="qtext">${esc(q.q)}</div>
     </div>`;
-    q.opts.forEach((opt,i)=>{
-      let cls = "opt";
-      if(state.answered){
-        if(i===q.correct) cls += " correct";
-        else if(i===state.selectedOpt) cls += " incorrect";
-        else cls += " faded";
+
+    if(q.multi){
+      q.opts.forEach((opt,i)=>{
+        let cls = "opt";
+        const isSelected = state.selectedOpts.includes(i);
+        const isCorrectOpt = q.correct.includes(i);
+        if(state.answered){
+          if(isCorrectOpt && isSelected) cls += " correct";
+          else if(isCorrectOpt && !isSelected) cls += " missed";
+          else if(!isCorrectOpt && isSelected) cls += " incorrect";
+          else cls += " faded";
+        } else if(isSelected){
+          cls += " selected";
+        }
+        html += `<button class="${cls}" ${state.answered?'disabled':''} onclick="__aplus.toggleMultiOption(${i})">${esc(opt)}</button>`;
+      });
+      if(!state.answered){
+        html += `<button class="primary-btn" onclick="__aplus.submitMultiAnswer()" ${state.selectedOpts.length===0?'disabled':''}>Submit (${state.selectedOpts.length} selected)</button>`;
+        html += `<button class="hint-btn" onclick="__aplus.askHint()" ${state.hintLoading?'disabled':''}>${state.hintLoading?'thinking\u2026':'\ud83d\udca1 Ask for a hint'}</button>`;
+        if(state.hint) html += `<div class="hint-box">${esc(state.hint)}</div>`;
+      } else {
+        const lastAnswer = state.quizAnswers[state.quizAnswers.length-1];
+        const isCorrect = lastAnswer.correct;
+        html += `<div class="feedback-banner ${isCorrect?'ok':'bad'}">${isCorrect?'CORRECT':'INCORRECT'}</div>`;
+        html += `<div class="explain-box"><b>Why:</b> ${esc(q.exp)}</div>`;
+        html += `<button class="primary-btn" onclick="__aplus.nextQuestion()">Continue</button>`;
       }
-      html += `<button class="${cls}" ${state.answered?'disabled':''} onclick="__aplus.selectOption(${i})">${esc(opt)}</button>`;
-    });
-    if(!state.answered){
-      html += `<button class="hint-btn" onclick="__aplus.askHint()" ${state.hintLoading?'disabled':''}>${state.hintLoading?'thinking\u2026':'\ud83d\udca1 Ask for a hint'}</button>`;
-      if(state.hint) html += `<div class="hint-box">${esc(state.hint)}</div>`;
-    }
-    if(state.answered){
-      const isCorrect = state.selectedOpt === q.correct;
-      html += `<div class="feedback-banner ${isCorrect?'ok':'bad'}">${isCorrect?'CORRECT':'INCORRECT'}</div>`;
-      html += `<div class="explain-box"><b>Why:</b> ${esc(q.exp)}</div>`;
-      html += `<button class="primary-btn" onclick="__aplus.nextQuestion()">Continue</button>`;
+    } else {
+      q.opts.forEach((opt,i)=>{
+        let cls = "opt";
+        if(state.answered){
+          if(i===q.correct) cls += " correct";
+          else if(i===state.selectedOpt) cls += " incorrect";
+          else cls += " faded";
+        }
+        html += `<button class="${cls}" ${state.answered?'disabled':''} onclick="__aplus.selectOption(${i})">${esc(opt)}</button>`;
+      });
+      if(!state.answered){
+        html += `<button class="hint-btn" onclick="__aplus.askHint()" ${state.hintLoading?'disabled':''}>${state.hintLoading?'thinking\u2026':'\ud83d\udca1 Ask for a hint'}</button>`;
+        if(state.hint) html += `<div class="hint-box">${esc(state.hint)}</div>`;
+      }
+      if(state.answered){
+        const isCorrect = state.selectedOpt === q.correct;
+        html += `<div class="feedback-banner ${isCorrect?'ok':'bad'}">${isCorrect?'CORRECT':'INCORRECT'}</div>`;
+        html += `<div class="explain-box"><b>Why:</b> ${esc(q.exp)}</div>`;
+        html += `<button class="primary-btn" onclick="__aplus.nextQuestion()">Continue</button>`;
+      }
     }
   }
 
@@ -1056,11 +1220,22 @@ function render(){
     }
     missed.forEach(a=>{
       const d = DOMAINS.find(x=>x.key===a.domainKey);
+      let answerLines;
+      if(a.q.multi){
+        const yourAnswer = a.selectedMulti.map(i=>a.q.opts[i]).join(', ') || '(nothing selected)';
+        const correctAnswer = a.q.correct.map(i=>a.q.opts[i]).join(', ');
+        answerLines = `
+        <div class="review-line"><span class="muted">Your answer:</span> <span class="amber">${esc(yourAnswer)}</span></div>
+        <div class="review-line"><span class="muted">Correct answer:</span> <span class="green">${esc(correctAnswer)}</span></div>`;
+      } else {
+        answerLines = `
+        <div class="review-line"><span class="muted">Your answer:</span> <span class="amber">${esc(a.q.opts[a.selected])}</span></div>
+        <div class="review-line"><span class="muted">Correct answer:</span> <span class="green">${esc(a.q.opts[a.q.correct])}</span></div>`;
+      }
       html += `<div class="qcard">
         <div class="qmeta">${d?d.name:''}</div>
         <div class="qtext" style="margin-bottom:12px;">${esc(a.q.q)}</div>
-        <div class="review-line"><span class="muted">Your answer:</span> <span class="amber">${esc(a.q.opts[a.selected])}</span></div>
-        <div class="review-line"><span class="muted">Correct answer:</span> <span class="green">${esc(a.q.opts[a.q.correct])}</span></div>
+        ${answerLines}
         <div class="explain-box" style="margin-top:12px;"><b>Why:</b> ${esc(a.q.exp)}</div>
       </div>`;
     });
@@ -1112,7 +1287,7 @@ function topbarHtml(minimal){
   </div>`;
 }
 
-window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest, exitQuiz, openModal, closeModal };
+window.__aplus = { startLesson, startDiagnostic, selectOption, nextQuestion, askHint, goHome, openDomain, openReview, backToResults, practiceWeakest, exitQuiz, openModal, closeModal, toggleMultiOption, submitMultiAnswer };
 loadState();
 })();
 
